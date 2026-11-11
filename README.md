@@ -16,7 +16,8 @@ Voir `ARCHITECTURE.md` (fonctionnement) et `CARNET_DE_BORD.md` (historique du pr
 
 1. **Grist** : créer un document vide, noter son ID (Paramètres du document) et créer une clé API
    (menu du profil → Clé API). Sur un site d'équipe, le serveur est `https://<equipe>.getgrist.com`.
-2. **Créer la table** (une seule fois) :
+2. **Créer la table** : le plus simple est le bouton « Créer la table dans Grist » de la page admin
+   (`?admin=1`) une fois l'appli déployée. Sinon, en ligne de commande (une seule fois) :
    ```
    pip install -r requirements.txt
    GRIST_DOC_ID=... GRIST_API_KEY=... python setup_grist.py

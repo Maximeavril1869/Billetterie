@@ -62,6 +62,17 @@ def page_admin(svc):
         if saisi:
             st.error("Mot de passe incorrect.")
         return
+    try:
+        table_ok = svc.store.table_existe()
+    except Exception:
+        st.error("Impossible de joindre Grist : vérifie GRIST_DOC_ID, GRIST_API_KEY et GRIST_SERVER.")
+        return
+    if not table_ok:
+        st.warning(f"La table « {TABLE} » n'existe pas encore dans le document Grist.")
+        if st.button("Créer la table dans Grist", type="primary"):
+            svc.store.creer_table()
+            st.success("Table créée. Recharge la page.")
+        return
     e = svc.etat()
     c1, c2, c3 = st.columns(3)
     c1.metric("Places confirmées", f"{e.confirmees} / {e.capacite}")

@@ -7,6 +7,10 @@
 - Décisions : plafond de 10 places par réservation, liste d'attente, annulation par lien, une réservation par e-mail.
 - Fait : modules `core/`, `app.py`, `setup_grist.py`, 17 tests pytest, documentation.
 
+## 2026-11-11 (soir) — Création de la table depuis l'appli
+- Pour ne pas avoir à partager la clé API : la page admin (`?admin=1`) détecte l'absence de la table
+  « Reservations » et propose un bouton « Créer la table dans Grist » (`setup_grist.py` reste utilisable).
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.

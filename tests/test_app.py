@@ -47,3 +47,14 @@ def test_annulation_par_lien(monkeypatch):
     at2, _ = lancer(monkeypatch, query={"annuler": token})
     # nouveau store vide => introuvable
     assert at2.info
+
+
+def test_admin_cree_la_table(monkeypatch):
+    import streamlit as st
+    st.cache_resource.clear()
+    at, store = lancer(monkeypatch, query={"admin": "1"}, secrets={"ADMIN_PASSWORD": "mdp"})
+    store.table_creee = False
+    at.text_input[0].set_value("mdp").run()
+    assert any("n'existe pas" in w.value for w in at.warning)
+    at.button[0].click().run()
+    assert store.table_creee

@@ -6,6 +6,12 @@ class FakeStore:
         self.recs = []
         self._id = 0
 
+    def table_existe(self):
+        return getattr(self, "table_creee", True)
+
+    def creer_table(self):
+        self.table_creee = True
+
     def list(self):
         return [dict(r) for r in self.recs]
 

@@ -66,6 +66,11 @@ class GristStore:
         )
         r.raise_for_status()
 
+    def table_existe(self):
+        r = self.session.get(f"{self.base}/tables", timeout=self.timeout)
+        r.raise_for_status()
+        return any(t["id"] == self.table for t in r.json()["tables"])
+
     def creer_table(self):
         """Crée la table et ses colonnes dans le document Grist."""
         colonnes = []
