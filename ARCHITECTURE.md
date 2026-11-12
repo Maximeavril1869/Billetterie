@@ -27,7 +27,8 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
   suffisent, sinon liste d'attente (une même liste, promotion dans l'ordre d'arrivée).
 - Plafond par réservation : 10 places (PMR comprises), dont 2 PMR au plus.
 - Au démarrage, l'appli ajoute les colonnes manquantes à la table Grist (`assurer_colonnes`).
-- Logo : `assets/logo.svg` (noir) et `assets/logo-blanc.svg`, affichés à côté du titre ; la version suit le thème clair/sombre.
+- Logo : `assets/logo.svg` inséré en SVG en ligne à côté du titre ; « OHL » utilise `currentColor`, donc suit le thème clair/sombre (`logo-blanc.svg` n'est plus utilisé).
+- Le service (`creer_service`) est mis en cache avec la date de modification du code comme clé, pour qu'un redéploiement ne garde pas un ancien objet.
 - Écriture tolérante : si une colonne manque dans Grist, l'appli réessaie sans elle au lieu d'échouer.
 - Annulation partielle : le lien d'annulation permet de retirer seulement certaines places ; l'id (rang d'arrivée) est conservé, les places libérées font monter la liste d'attente.
 - Un verrou protège les réservations simultanées dans l'appli ; un contrôle après écriture

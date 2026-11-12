@@ -33,6 +33,14 @@
 - Retour utilisateur : carte blanche peu élégante en mode sombre, logo trop petit face au titre.
 - Nouvel en-tête : logo (104 px) et titre/date/lieu dans un seul bloc ; logo noir en thème clair, blanc en thème sombre.
 
+## 2026-11-13 (nuit) — Correctif annulation et logo clair/sombre
+- Bug : le lien d'annulation du mail plantait (`AttributeError` sur `svc.retirer_places`). Cause : le service mis en cache
+  par `st.cache_resource` datait d'avant l'ajout de l'annulation partielle et survivait au redéploiement.
+  Correctif : le cache est maintenant lié à la date de modification du code (`_version_code()`).
+- Logo : en mode clair, « OHL » n'était plus visible (version blanche choisie à tort). Le logo est désormais un SVG en ligne
+  dont le texte prend la couleur du thème (`currentColor`) : plus de détection de thème. `logo-blanc.svg` n'est plus utilisé.
+- Test d'en-tête adapté (33 tests OK).
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.

@@ -90,4 +90,4 @@ def test_entete_avec_logo(monkeypatch):
     import streamlit as st
     st.cache_resource.clear()
     at, _ = lancer(monkeypatch)
-    assert any("data:image/svg+xml;base64" in m.value for m in at.markdown)
+    assert any('<svg class="logo"' in m.value and "currentColor" in m.value for m in at.markdown)

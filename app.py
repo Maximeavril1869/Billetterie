@@ -1,6 +1,6 @@
 """Billetterie gratuite : page publique de réservation, annulation par lien, page admin."""
-import base64
 import hmac
+import re
 
 import streamlit as st
 
@@ -17,8 +17,18 @@ from core.store import GristStore
 st.set_page_config(page_title=CONCERT["titre"], page_icon="🎶")
 
 
+def _version_code():
+    """Change à chaque redéploiement : évite de garder un ancien service en cache."""
+    base = os.path.dirname(os.path.abspath(__file__))
+    fichiers = [os.path.join(base, "app.py")]
+    cdir = os.path.join(base, "core")
+    if os.path.isdir(cdir):
+        fichiers += [os.path.join(cdir, f) for f in os.listdir(cdir) if f.endswith(".py")]
+    return max((os.path.getmtime(f) for f in fichiers if os.path.exists(f)), default=0)
+
+
 @st.cache_resource
-def creer_service():
+def creer_service(version):
     store = GristStore(
         secret("GRIST_SERVER", "https://docs.getgrist.com"),
         secret("GRIST_DOC_ID"),
@@ -38,47 +48,30 @@ def creer_service():
     )
 
 
-def _logo_b64(nom):
-    chemin = os.path.join(os.path.dirname(__file__), "assets", nom)
+def _logo_svg():
+    """Logo en SVG en ligne : « OHL » prend la couleur du texte (noir en clair, blanc en sombre)."""
+    chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "logo.svg")
     if not os.path.exists(chemin):
-        return None
-    with open(chemin, "rb") as f:
-        return base64.b64encode(f.read()).decode()
-
-
-def _theme():
-    try:
-        return st.context.theme.type  # "light" / "dark" (versions récentes de Streamlit)
-    except Exception:
-        return None
+        return ""
+    with open(chemin, encoding="utf-8") as f:
+        svg = f.read()
+    svg = re.sub(r"<\?xml[^>]*\?>|<!--.*?-->", "", svg, flags=re.S)
+    svg = svg.replace('fill="#000000"', 'fill="currentColor"')
+    svg = re.sub(r'<svg width="\d+" height="\d+"', '<svg class="logo"', svg)
+    return " ".join(svg.split())  # une seule ligne, sans ligne vide (sinon le markdown la coupe)
 
 
 def entete():
-    """Logo + titre dans un seul bloc ; logo noir en thème clair, blanc en thème sombre."""
-    noir, blanc = _logo_b64("logo.svg"), _logo_b64("logo-blanc.svg")
-    theme = _theme()
-    imgs = ""
-    if noir and blanc:
-        if theme == "dark":
-            imgs = f'<img src="data:image/svg+xml;base64,{blanc}"/>'
-        elif theme == "light":
-            imgs = f'<img src="data:image/svg+xml;base64,{noir}"/>'
-        else:  # thème inconnu : on suit le réglage du téléphone
-            imgs = (f'<img class="clair" src="data:image/svg+xml;base64,{noir}"/>'
-                    f'<img class="sombre" src="data:image/svg+xml;base64,{blanc}"/>')
-    elif noir:
-        imgs = f'<img src="data:image/svg+xml;base64,{noir}"/>'
+    """Logo + titre dans un seul bloc."""
     st.markdown(
         """<style>
 .ent{display:flex;align-items:center;gap:18px;margin:4px 0 14px}
-.ent img{height:88px;width:auto;flex:0 0 auto}
+.ent svg.logo{height:88px;width:auto;flex:0 0 auto}
 .ent>div:last-child{flex:1 1 0;min-width:0}
-.ent .sombre{display:none}
-@media (prefers-color-scheme: dark){.ent .clair{display:none}.ent .sombre{display:inline}}
 .ent .titre{font-size:1.6rem;font-weight:700;line-height:1.15}
 .ent .sous{margin-top:8px;font-size:.98rem;line-height:1.55;opacity:.9}
 </style>"""
-        f'<div class="ent">{imgs}<div><div class="titre">🎶 {CONCERT["titre"]}</div>'
+        f'<div class="ent">{_logo_svg()}<div><div class="titre">🎶 {CONCERT["titre"]}</div>'
         f'<div class="sous"><b>{CONCERT["date"]} à {CONCERT["heure"]}</b><br>'
         f'📍 {CONCERT["lieu"]}<br>{CONCERT["asso"]} — entrée libre, réservation gratuite'
         "</div></div></div>",
@@ -245,7 +238,7 @@ def page_publique(svc):
             st.caption("Compteur momentanément indisponible.")
 
 
-svc = creer_service()
+svc = creer_service(_version_code())
 params = st.query_params
 if "annuler" in params:
     page_annulation(svc, params["annuler"])
