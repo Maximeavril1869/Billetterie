@@ -54,6 +54,18 @@ def page_annulation(svc, token):
             st.info(str(e))
 
 
+def diagnostic_grist(exc):
+    """Explique l'échec sans jamais afficher de secret."""
+    code = getattr(getattr(exc, "response", None), "status_code", None)
+    if code in (401, 403):
+        return f"(erreur {code}) La clé API est refusée ou n'a pas accès à ce document : vérifie GRIST_API_KEY et que la clé vient du compte qui possède le document."
+    if code == 404:
+        return "(erreur 404) Document introuvable : vérifie GRIST_DOC_ID et GRIST_SERVER (site d'équipe = https://ton-equipe.getgrist.com)."
+    if code:
+        return f"(erreur HTTP {code})"
+    return f"({type(exc).__name__}) Vérifie GRIST_SERVER et que les 3 valeurs GRIST_* sont bien renseignées, sans espace ni guillemet en trop."
+
+
 def page_admin(svc):
     st.title("Administration")
     mdp = secret("ADMIN_PASSWORD")
@@ -64,8 +76,8 @@ def page_admin(svc):
         return
     try:
         table_ok = svc.store.table_existe()
-    except Exception:
-        st.error("Impossible de joindre Grist : vérifie GRIST_DOC_ID, GRIST_API_KEY et GRIST_SERVER.")
+    except Exception as exc:
+        st.error(f"Impossible de joindre Grist. {diagnostic_grist(exc)}")
         return
     if not table_ok:
         st.warning(f"La table « {TABLE} » n'existe pas encore dans le document Grist.")
