@@ -70,6 +70,18 @@ def diagnostic_grist(exc):
     return f"({type(exc).__name__}) Vérifie GRIST_SERVER et que les 3 valeurs GRIST_* sont bien renseignées, sans espace ni guillemet en trop."
 
 
+def detail_erreur(exc):
+    """Type d'erreur, code HTTP et réponse de Grist (tronquée). Aucun secret n'y figure."""
+    rep = getattr(exc, "response", None)
+    morceaux = [type(exc).__name__]
+    if rep is not None:
+        morceaux.append(f"HTTP {rep.status_code}")
+        morceaux.append((rep.text or "")[:300])
+    else:
+        morceaux.append(str(exc)[:200])
+    return " | ".join(morceaux)
+
+
 def page_admin(svc):
     st.title("Administration")
     mdp = secret("ADMIN_PASSWORD")
@@ -139,8 +151,9 @@ def page_publique(svc):
                 )
         except ErreurReservation as err:
             st.error(str(err))
-        except Exception:
+        except Exception as exc:
             st.error("Une erreur technique est survenue, merci de réessayer dans un instant.")
+            st.caption(f"Détail : {detail_erreur(exc)}")
 
     with compteur:
         try:
