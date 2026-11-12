@@ -93,3 +93,15 @@ def message_annulation(rec, app_url):
         f"{_infos()}\n"
     )
     return f"Réservation annulée - {CONCERT['titre']}", corps
+
+
+def message_modification(rec, app_url):
+    etat = "CONFIRMÉE" if rec["statut"] == "confirmee" else "toujours sur LISTE D'ATTENTE"
+    corps = (
+        f"Bonjour {_qui(rec)},\n\n"
+        f"Votre réservation a été modifiée : il vous reste {_places_txt(rec)} (réservation {etat}).\n"
+        "Votre rang d'arrivée est conservé.\n\n"
+        f"{_infos()}\n\n"
+        f"Pour modifier ou annuler à nouveau :\n{_lien(app_url, rec['token'])}\n"
+    )
+    return f"Réservation modifiée - {CONCERT['titre']}", corps

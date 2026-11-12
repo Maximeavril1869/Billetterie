@@ -63,3 +63,31 @@ def test_admin_cree_la_table(monkeypatch):
     assert any("n'existe pas" in w.value for w in at.warning)
     at.button[0].click().run()
     assert store.table_creee
+
+
+def test_page_annulation_partielle(monkeypatch):
+    import streamlit as st
+    st.cache_resource.clear()
+    at, store = lancer(monkeypatch)
+    at.text_input[0].set_value("Ana")
+    at.text_input[1].set_value("Test")
+    at.text_input[2].set_value("ana@example.fr")
+    at.number_input[0].set_value(10)
+    at.button[0].click().run()
+    token = store.recs[0]["token"]
+    # même processus, même faux store : on ouvre la page d'annulation
+    at2 = AppTest.from_file(str(Path(__file__).resolve().parent.parent / "app.py"), default_timeout=10)
+    at2.query_params["annuler"] = token
+    at2.run()
+    assert not at2.exception
+    at2.number_input[0].set_value(8)
+    at2.button[0].click().run()
+    assert store.recs[0]["places"] == 2 and store.recs[0]["statut"] == "confirmee"
+    assert any("modifiée" in s.value for s in at2.success)
+
+
+def test_entete_avec_logo(monkeypatch):
+    import streamlit as st
+    st.cache_resource.clear()
+    at, _ = lancer(monkeypatch)
+    assert any("data:image/svg+xml;base64" in m.value for m in at.markdown)

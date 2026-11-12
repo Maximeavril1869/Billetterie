@@ -165,6 +165,42 @@ class Billetterie:
         self._prevenir(promus)
         return rec, promus
 
+    def retirer_places(self, token, retire_std, retire_pmr=0):
+        """Annule tout ou partie d'une réservation. Le rang d'arrivée (id) est conservé.
+        Retourne (rec_après, promus)."""
+        if not isinstance(retire_std, int) or not isinstance(retire_pmr, int) \
+                or retire_std < 0 or retire_pmr < 0 or retire_std + retire_pmr == 0:
+            raise ErreurReservation("Indiquez au moins une place à annuler.")
+        with _VERROU:
+            rec = next(
+                (r for r in self.store.list() if r["token"] == token and r["statut"] in ACTIVES),
+                None,
+            )
+            if rec is None:
+                raise ErreurReservation("Réservation introuvable ou déjà annulée.")
+            if retire_std > rec["places"] or retire_pmr > rec.get("pmr", 0):
+                raise ErreurReservation("Vous ne pouvez pas annuler plus de places que réservées.")
+            reste_std = rec["places"] - retire_std
+            reste_pmr = rec.get("pmr", 0) - retire_pmr
+            if reste_std + reste_pmr == 0:
+                self.store.update(rec["id"], {"statut": ANNULEE})
+                apres = {**rec, "statut": ANNULEE}
+            else:
+                self.store.update(rec["id"], {"places": reste_std, "pmr": reste_pmr})
+                apres = {**rec, "places": reste_std, "pmr": reste_pmr}
+            promus = self._promouvoir()
+            # la demande modifiée a pu être promue elle-même : relire son statut
+            apres["statut"] = next(
+                (r["statut"] for r in self.store.list() if r["id"] == rec["id"]), apres["statut"]
+            )
+        promus_autres = [p for p in promus if p["id"] != rec["id"]]
+        if apres["statut"] == ANNULEE:
+            self._envoyer(apres, *m.message_annulation(apres, self.app_url))
+        else:
+            self._envoyer(apres, *m.message_modification(apres, self.app_url))
+        self._prevenir(promus_autres)
+        return apres, promus
+
     def promouvoir(self):
         """Promeut la liste d'attente si des places sont libres (ex. annulation faite dans Grist)."""
         with _VERROU:

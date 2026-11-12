@@ -6,7 +6,7 @@ Billetterie **gratuite** pour le Concert de la Sainte Cécile (Association des m
 - Page publique avec compteur de places restantes et formulaire de réservation
 - Liste d'attente automatique quand c'est complet
 - E-mail de confirmation (Gmail) avec lien d'annulation personnel
-- Annulation → les places sont libérées et la liste d'attente est promue (mails envoyés)
+- Annulation totale ou partielle (au choix) → les places sont libérées et la liste d'attente est promue (mails envoyés)
 - Page admin (`?admin=1`) + liste complète dans Grist (la base de données)
 
 Stack : Python, [Streamlit](https://streamlit.io) pour l'interface, [Grist](https://www.getgrist.com) comme base.

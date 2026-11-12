@@ -27,7 +27,8 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
   suffisent, sinon liste d'attente (une même liste, promotion dans l'ordre d'arrivée).
 - Plafond par réservation : 10 places (PMR comprises), dont 2 PMR au plus.
 - Au démarrage, l'appli ajoute les colonnes manquantes à la table Grist (`assurer_colonnes`).
-- Logo : déposer `assets/logo.png`, il s'affiche en haut de la page.
+- Logo : `assets/logo.svg` (version blanche), affiché sur un bandeau sombre en haut de la page.
+- Annulation partielle : le lien d'annulation permet de retirer seulement certaines places ; l'id (rang d'arrivée) est conservé, les places libérées font monter la liste d'attente.
 - Un verrou protège les réservations simultanées dans l'appli ; un contrôle après écriture
   rétrograde la plus récente en attente si deux processus ont débordé la jauge.
 - Annulation : statut `annulee`, puis promotion de la liste d'attente dans l'ordre d'arrivée

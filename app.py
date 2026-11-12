@@ -1,4 +1,5 @@
 """Billetterie gratuite : page publique de réservation, annulation par lien, page admin."""
+import base64
 import hmac
 
 import streamlit as st
@@ -38,9 +39,18 @@ def creer_service():
 
 
 def entete():
-    logo = os.path.join(os.path.dirname(__file__), "assets", "logo.png")
+    logo = os.path.join(os.path.dirname(__file__), "assets", "logo.svg")
     if os.path.exists(logo):
-        st.image(logo, width=160)
+        with open(logo, "rb") as f:
+            b64 = base64.b64encode(f.read()).decode()
+        # logo blanc : on le pose sur un bandeau sombre
+        st.markdown(
+            '<div style="background:#14213d;padding:14px 18px;border-radius:12px;'
+            'display:flex;align-items:center;gap:16px;margin-bottom:12px">'
+            f'<img src="data:image/svg+xml;base64,{b64}" style="height:56px"/>'
+            f'<div style="color:#ffb800;font-weight:600">{CONCERT["asso"]}</div></div>',
+            unsafe_allow_html=True,
+        )
     st.title(f"🎶 {CONCERT['titre']}")
     st.markdown(
         f"**{CONCERT['date']} à {CONCERT['heure']}**  \n"
@@ -51,17 +61,34 @@ def entete():
 
 def page_annulation(svc, token):
     entete()
-    st.subheader("Annuler une réservation")
+    st.subheader("Modifier ou annuler une réservation")
     rec = svc.trouver(token)
     if rec is None or rec["statut"] not in ("confirmee", "attente"):
         st.info("Cette réservation est introuvable ou déjà annulée.")
         return
     detail = f"{rec['places']} place(s)" + (f" + {rec['pmr']} PMR" if rec["pmr"] else "")
     st.write(f"Réservation au nom de **{rec['prenom']} {rec['nom']}** : {detail}.")
-    if st.button("Confirmer l'annulation", type="primary"):
+    st.caption("Votre rang d'arrivée est conservé si vous annulez seulement une partie des places.")
+    a_std = a_pmr = 0
+    if rec["places"]:
+        a_std = st.number_input(
+            "Places standard à annuler", min_value=0, max_value=rec["places"],
+            value=rec["places"], step=1,
+        )
+    if rec["pmr"]:
+        a_pmr = st.number_input(
+            "Places PMR à annuler", min_value=0, max_value=rec["pmr"],
+            value=rec["pmr"], step=1,
+        )
+    reste = (rec["places"] - int(a_std)) + (rec["pmr"] - int(a_pmr))
+    st.write("Tout sera annulé." if reste == 0 else f"Il vous restera **{reste} place(s)**.")
+    if st.button("Valider", type="primary"):
         try:
-            svc.annuler(token)
-            st.success("Votre réservation est annulée. Merci de nous avoir prévenus !")
+            apres, _ = svc.retirer_places(token, int(a_std), int(a_pmr))
+            if apres["statut"] == "annulee":
+                st.success("Votre réservation est annulée. Merci de nous avoir prévenus !")
+            else:
+                st.success("Votre réservation est modifiée. Un e-mail de confirmation vous est envoyé.")
         except ErreurReservation as e:
             st.info(str(e))
 

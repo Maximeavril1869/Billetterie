@@ -167,3 +167,37 @@ def test_promouvoir_apres_annulation_manuelle_grist():
     res(b, "B", 2)
     store.update(a.reservation["id"], {"statut": "annulee"})
     assert len(b.promouvoir()) == 1 and b.etat().confirmees == 2
+
+
+def test_annulation_partielle_garde_le_rang_et_libere():
+    b, store, mailer = fabrique(capacite=10)
+    a = res(b, "A", 10)          # prend tout
+    c = res(b, "C", 4)           # attente
+    rec, promus = b.retirer_places(a.reservation["token"], 8)
+    assert rec["places"] == 2 and rec["statut"] == "confirmee"
+    assert [p["nom"] for p in promus] == ["C"]
+    assert b.etat().confirmees == 6
+    ids = [r["id"] for r in store.list()]
+    assert a.reservation["id"] == min(ids)          # rang conservé
+    assert any("modifiée" in m[1] for m in mailer.envoyes)
+
+
+def test_annulation_partielle_pmr_et_validations():
+    b, _, _ = fabrique()
+    a = res(b, "A", 2, 2)
+    rec, _ = b.retirer_places(a.reservation["token"], 0, 1)
+    assert rec["pmr"] == 1 and b.etat().pmr_confirmees == 1
+    for args in [(0, 0), (3, 0), (0, 2), (-1, 0)]:
+        with pytest.raises(ErreurReservation):
+            b.retirer_places(a.reservation["token"], *args)
+    rec, _ = b.retirer_places(a.reservation["token"], 2, 1)
+    assert rec["statut"] == "annulee"
+
+
+def test_annulation_partielle_en_attente_peut_etre_promue():
+    b, _, _ = fabrique(capacite=5)
+    res(b, "A", 4)
+    c = res(b, "C", 3)           # attente
+    assert c.statut == "attente"
+    rec, _ = b.retirer_places(c.reservation["token"], 2)   # reste 1 place -> rentre
+    assert rec["statut"] == "confirmee" and b.etat().confirmees == 5

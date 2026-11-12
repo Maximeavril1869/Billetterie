@@ -20,7 +20,9 @@
 - 4 places PMR en plus des 300 : jauge séparée, mélange standard + PMR possible, max 2 PMR par réservation,
   liste d'attente commune (FIFO), compteur PMR public.
 - La table Grist est complétée automatiquement (colonnes `Prenom`, `PMR`).
-- Logo : emplacement prêt (`assets/logo.png`), en attente du fichier.
+- Logo OHL (SVG blanc) ajouté dans `assets/logo.svg`, bandeau sombre en en-tête.
+- Annulation partielle (choix du nombre de places à annuler, rang conservé) + mail « Réservation modifiée ».
+- Gmail branché par l'utilisateur ; essai de bout en bout à faire.
 
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
