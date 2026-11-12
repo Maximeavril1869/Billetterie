@@ -19,7 +19,7 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
 ## Table Grist « Reservations »
 
 `Nom`, `Email`, `Telephone`, `Places` (entier), `Statut` (`confirmee` / `attente` / `annulee`),
-`Token` (secret du lien d'annulation), `Cree` (date de création).
+`Token` (secret du lien d'annulation). L'ordre d'arrivée est le numéro de ligne Grist.
 
 ## Règles
 

@@ -2,7 +2,6 @@
 import re
 import secrets
 import threading
-import time
 from dataclasses import dataclass
 
 from . import mailer as m
@@ -99,7 +98,6 @@ class Billetterie:
                     "places": places,
                     "statut": statut,
                     "token": token,
-                    "cree": int(time.time()),
                 }
             )
             if statut == CONFIRMEE:

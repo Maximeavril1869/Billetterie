@@ -11,6 +11,10 @@
 - Pour ne pas avoir à partager la clé API : la page admin (`?admin=1`) détecte l'absence de la table
   « Reservations » et propose un bouton « Créer la table dans Grist » (`setup_grist.py` reste utilisable).
 
+## 2026-11-13 — Correctif colonne Cree
+- Erreur Grist 400 « Invalid column Cree » à la première réservation : la table réelle n'avait pas cette colonne.
+- Colonne `Cree` supprimée du code (inutile, l'ordre vient du numéro de ligne).
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.

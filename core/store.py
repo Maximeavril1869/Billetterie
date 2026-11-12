@@ -12,7 +12,6 @@ COLONNES = [
     ("Places", "Int", None),
     ("Statut", "Choice", {"choices": STATUTS}),
     ("Token", "Text", None),
-    ("Cree", "DateTime:Europe/Paris", None),
 ]
 
 
@@ -44,7 +43,6 @@ class GristStore:
                     "places": int(f.get("Places") or 0),
                     "statut": f.get("Statut") or "",
                     "token": f.get("Token") or "",
-                    "cree": f.get("Cree") or 0,
                 }
             )
         return out
@@ -94,7 +92,6 @@ _CLES = {
     "places": "Places",
     "statut": "Statut",
     "token": "Token",
-    "cree": "Cree",
 }
 
 

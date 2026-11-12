@@ -108,9 +108,9 @@ def test_garde_fou_multi_processus():
     """Deux processus écrivent en même temps : le plus récent est rétrogradé."""
     b, store, _ = fabrique(capacite=5)
     store.add({"nom": "A", "email": "a@ex.fr", "telephone": "", "places": 4,
-               "statut": "confirmee", "token": "t1", "cree": 0})
+               "statut": "confirmee", "token": "t1"})
     rec_id = store.add({"nom": "B", "email": "b@ex.fr", "telephone": "", "places": 3,
-                        "statut": "confirmee", "token": "t2", "cree": 0})
+                        "statut": "confirmee", "token": "t2"})
     assert b._verifier_jauge(rec_id) == "attente"
     assert b.etat().confirmees == 4
 
