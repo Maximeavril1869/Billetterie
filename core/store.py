@@ -14,6 +14,7 @@ COLONNES = [
     ("PMR", "Int", None),
     ("Statut", "Choice", {"choices": STATUTS}),
     ("Token", "Text", None),
+    ("DateCommande", "DateTime:Europe/Paris", None),
 ]
 
 
@@ -47,26 +48,34 @@ class GristStore:
                     "pmr": int(f.get("PMR") or 0),
                     "statut": f.get("Statut") or "",
                     "token": f.get("Token") or "",
+                    "cree": f.get("DateCommande") or 0,
                 }
             )
         return out
 
-    def add(self, fields):
-        r = self.session.post(
-            self._url(),
-            json={"records": [{"fields": _vers_grist(fields)}]},
-            timeout=self.timeout,
-        )
+    def _colonnes_existantes(self):
+        r = self.session.get(f"{self.base}/tables/{self.table}/columns", timeout=self.timeout)
         r.raise_for_status()
+        return {c["id"] for c in r.json()["columns"]}
+
+    def _ecrire(self, methode, record):
+        """POST/PATCH d'un enregistrement. Si une colonne n'existe pas (erreur 400
+        « Invalid column »), on réessaie une fois sans les colonnes absentes."""
+        envoyer = getattr(self.session, methode)
+        r = envoyer(self._url(), json={"records": [record]}, timeout=self.timeout)
+        if r.status_code == 400 and "Invalid column" in r.text:
+            existantes = self._colonnes_existantes()
+            record = {**record, "fields": {k: v for k, v in record["fields"].items() if k in existantes}}
+            r = envoyer(self._url(), json={"records": [record]}, timeout=self.timeout)
+        r.raise_for_status()
+        return r
+
+    def add(self, fields):
+        r = self._ecrire("post", {"fields": _vers_grist(fields)})
         return r.json()["records"][0]["id"]
 
     def update(self, rec_id, fields):
-        r = self.session.patch(
-            self._url(),
-            json={"records": [{"id": rec_id, "fields": _vers_grist(fields)}]},
-            timeout=self.timeout,
-        )
-        r.raise_for_status()
+        self._ecrire("patch", {"id": rec_id, "fields": _vers_grist(fields)})
 
     def table_existe(self):
         r = self.session.get(f"{self.base}/tables", timeout=self.timeout)
@@ -79,14 +88,19 @@ class GristStore:
         r.raise_for_status()
         existantes = {c["id"] for c in r.json()["columns"]}
         manquantes = [c for c in _definitions() if c["id"] not in existantes]
-        if manquantes:
-            r = self.session.post(
-                f"{self.base}/tables/{self.table}/columns",
-                json={"columns": manquantes},
-                timeout=self.timeout,
-            )
-            r.raise_for_status()
-        return [c["id"] for c in manquantes]
+        ajoutees = []
+        for col in manquantes:
+            try:
+                rr = self.session.post(
+                    f"{self.base}/tables/{self.table}/columns",
+                    json={"columns": [col]},
+                    timeout=self.timeout,
+                )
+                rr.raise_for_status()
+                ajoutees.append(col["id"])
+            except Exception:
+                continue
+        return ajoutees
 
     def creer_table(self):
         """Crée la table et ses colonnes dans le document Grist."""
@@ -118,6 +132,7 @@ _CLES = {
     "pmr": "PMR",
     "statut": "Statut",
     "token": "Token",
+    "cree": "DateCommande",
 }
 
 

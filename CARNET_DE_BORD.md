@@ -24,6 +24,11 @@
 - Annulation partielle (choix du nombre de places à annuler, rang conservé) + mail « Réservation modifiée ».
 - Gmail branché par l'utilisateur ; essai de bout en bout à faire.
 
+## 2026-11-13 — Logo noir et date de commande
+- Logo noir (SVG) dans une carte blanche en en-tête (remplace le bandeau sombre du logo blanc).
+- Colonne `DateCommande` (date et heure, fuseau Paris) ajoutée automatiquement dans Grist, info pour l'organisateur.
+- Écriture Grist tolérante aux colonnes absentes (réessai sans elles).
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.

@@ -2,6 +2,7 @@
 import re
 import secrets
 import threading
+import time
 from dataclasses import dataclass
 
 from . import mailer as m
@@ -124,6 +125,7 @@ class Billetterie:
             champs = {
                 "prenom": prenom, "nom": nom, "email": email, "telephone": telephone,
                 "places": places, "pmr": pmr, "statut": statut, "token": token,
+                "cree": int(time.time()),
             }
             rec_id = self.store.add(champs)
             if statut == CONFIRMEE:

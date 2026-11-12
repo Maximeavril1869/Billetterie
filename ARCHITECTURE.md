@@ -19,7 +19,7 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
 ## Table Grist « Reservations »
 
 `Prenom`, `Nom`, `Email`, `Telephone`, `Places` (places standard), `PMR` (places PMR), `Statut` (`confirmee` / `attente` / `annulee`),
-`Token` (secret du lien d'annulation). L'ordre d'arrivée est le numéro de ligne Grist.
+`Token` (secret du lien d'annulation), `DateCommande` (date et heure de la commande, à titre d'info). L'ordre d'arrivée est le numéro de ligne Grist.
 
 ## Règles
 
@@ -27,7 +27,8 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
   suffisent, sinon liste d'attente (une même liste, promotion dans l'ordre d'arrivée).
 - Plafond par réservation : 10 places (PMR comprises), dont 2 PMR au plus.
 - Au démarrage, l'appli ajoute les colonnes manquantes à la table Grist (`assurer_colonnes`).
-- Logo : `assets/logo.svg` (version blanche), affiché sur un bandeau sombre en haut de la page.
+- Logo : `assets/logo.svg` (version noire), affiché dans une carte blanche en haut de la page.
+- Écriture tolérante : si une colonne manque dans Grist, l'appli réessaie sans elle au lieu d'échouer.
 - Annulation partielle : le lien d'annulation permet de retirer seulement certaines places ; l'id (rang d'arrivée) est conservé, les places libérées font monter la liste d'attente.
 - Un verrou protège les réservations simultanées dans l'appli ; un contrôle après écriture
   rétrograde la plus récente en attente si deux processus ont débordé la jauge.

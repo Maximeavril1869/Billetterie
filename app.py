@@ -43,12 +43,12 @@ def entete():
     if os.path.exists(logo):
         with open(logo, "rb") as f:
             b64 = base64.b64encode(f.read()).decode()
-        # logo blanc : on le pose sur un bandeau sombre
+        # carte blanche : le logo reste lisible quel que soit le thème clair/sombre
         st.markdown(
-            '<div style="background:#14213d;padding:14px 18px;border-radius:12px;'
-            'display:flex;align-items:center;gap:16px;margin-bottom:12px">'
-            f'<img src="data:image/svg+xml;base64,{b64}" style="height:56px"/>'
-            f'<div style="color:#ffb800;font-weight:600">{CONCERT["asso"]}</div></div>',
+            '<div style="background:#ffffff;padding:12px 18px;border-radius:12px;'
+            'display:flex;align-items:center;gap:16px;margin-bottom:12px;border:1px solid #e5e7eb">'
+            f'<img src="data:image/svg+xml;base64,{b64}" style="height:64px"/>'
+            f'<div style="color:#1f2937;font-weight:600">{CONCERT["asso"]}</div></div>',
             unsafe_allow_html=True,
         )
     st.title(f"🎶 {CONCERT['titre']}")
