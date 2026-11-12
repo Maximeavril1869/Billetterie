@@ -25,13 +25,17 @@ def test_page_publique_et_reservation(monkeypatch):
     at, store = lancer(monkeypatch)
     assert not at.exception
     assert "300 places restantes" in " ".join(m.value for m in at.markdown)
-    at.text_input[0].set_value("Ana Test")
-    at.text_input[1].set_value("ana@example.fr")
+    at.text_input[0].set_value("Ana")
+    at.text_input[1].set_value("Test")
+    at.text_input[2].set_value("ana@example.fr")
     at.number_input[0].set_value(4)
+    at.number_input[1].set_value(1)
     at.button[0].click().run()
     assert not at.exception
     assert any("confirmée" in s.value for s in at.success)
-    assert store.recs[0]["places"] == 4
+    assert store.recs[0]["places"] == 4 and store.recs[0]["pmr"] == 1
+    assert "3 places PMR restantes" in " ".join(m.value for m in at.markdown)
+    assert any("Maximum" in c.value for c in at.caption)
     assert "296 places restantes" in " ".join(m.value for m in at.markdown)
 
 
@@ -40,7 +44,8 @@ def test_annulation_par_lien(monkeypatch):
     st.cache_resource.clear()
     at, store = lancer(monkeypatch)
     at.text_input[0].set_value("Ana")
-    at.text_input[1].set_value("ana@example.fr")
+    at.text_input[1].set_value("Test")
+    at.text_input[2].set_value("ana@example.fr")
     at.button[0].click().run()
     token = store.recs[0]["token"]
     st.cache_resource.clear()

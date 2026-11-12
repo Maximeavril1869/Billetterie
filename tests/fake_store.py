@@ -9,6 +9,9 @@ class FakeStore:
     def table_existe(self):
         return getattr(self, "table_creee", True)
 
+    def assurer_colonnes(self):
+        return []
+
     def creer_table(self):
         self.table_creee = True
 

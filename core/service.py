@@ -1,4 +1,4 @@
-"""Règles métier : jauge, liste d'attente, annulation, promotion."""
+"""Règles métier : jauges (standard + PMR), liste d'attente, annulation, promotion."""
 import re
 import secrets
 import threading
@@ -23,6 +23,8 @@ class Etat:
     capacite: int
     confirmees: int
     en_attente: int
+    capacite_pmr: int = 0
+    pmr_confirmees: int = 0
 
     @property
     def restantes(self):
@@ -32,6 +34,14 @@ class Etat:
     def complet(self):
         return self.restantes == 0
 
+    @property
+    def pmr_restantes(self):
+        return max(self.capacite_pmr - self.pmr_confirmees, 0)
+
+    @property
+    def pmr_complet(self):
+        return self.pmr_restantes == 0
+
 
 @dataclass
 class Resultat:
@@ -40,22 +50,33 @@ class Resultat:
     mail_ok: bool
 
 
+def _totaux(recs):
+    conf = [r for r in recs if r["statut"] == CONFIRMEE]
+    return sum(r["places"] for r in conf), sum(r.get("pmr", 0) for r in conf)
+
+
 class Billetterie:
-    def __init__(self, store, mailer, capacite, max_par_resa, app_url="", une_resa_par_email=True):
+    def __init__(self, store, mailer, capacite, max_par_resa, app_url="",
+                 une_resa_par_email=True, capacite_pmr=0, max_pmr_par_resa=0):
         self.store = store
         self.mailer = mailer
         self.capacite = capacite
+        self.capacite_pmr = capacite_pmr
         self.max_par_resa = max_par_resa
+        self.max_pmr_par_resa = max_pmr_par_resa
         self.app_url = app_url
         self.une_resa_par_email = une_resa_par_email
 
     # ---------- lecture ----------
     def etat(self):
         recs = self.store.list()
+        std, pmr = _totaux(recs)
         return Etat(
             capacite=self.capacite,
-            confirmees=sum(r["places"] for r in recs if r["statut"] == CONFIRMEE),
+            confirmees=std,
             en_attente=sum(1 for r in recs if r["statut"] == ATTENTE),
+            capacite_pmr=self.capacite_pmr,
+            pmr_confirmees=pmr,
         )
 
     def trouver(self, token):
@@ -67,16 +88,25 @@ class Billetterie:
         return None
 
     # ---------- réservation ----------
-    def reserver(self, nom, email, telephone, places):
+    def reserver(self, prenom, nom, email, telephone, places, pmr=0):
+        prenom = (prenom or "").strip()
         nom = (nom or "").strip()
         email = (email or "").strip().lower()
         telephone = (telephone or "").strip()
-        if not nom or len(nom) > 100:
-            raise ErreurReservation("Merci d'indiquer votre nom (100 caractères maximum).")
+        if not prenom or not nom or len(prenom) > 100 or len(nom) > 100:
+            raise ErreurReservation("Merci d'indiquer votre prénom et votre nom.")
         if not EMAIL_RE.match(email) or len(email) > 200:
             raise ErreurReservation("L'adresse e-mail n'est pas valide.")
-        if not isinstance(places, int) or not 1 <= places <= self.max_par_resa:
-            raise ErreurReservation(f"Vous pouvez réserver de 1 à {self.max_par_resa} places.")
+        if not isinstance(places, int) or not isinstance(pmr, int) or places < 0 or pmr < 0:
+            raise ErreurReservation("Nombre de places invalide.")
+        if pmr > self.max_pmr_par_resa:
+            raise ErreurReservation(
+                f"Vous pouvez réserver au maximum {self.max_pmr_par_resa} places PMR par réservation."
+            )
+        if not 1 <= places + pmr <= self.max_par_resa:
+            raise ErreurReservation(
+                f"Une réservation porte sur 1 à {self.max_par_resa} places (PMR comprises)."
+            )
 
         with _VERROU:
             recs = self.store.list()
@@ -87,39 +117,33 @@ class Billetterie:
                     "Une réservation existe déjà avec cette adresse e-mail. "
                     "Annulez-la d'abord grâce au lien reçu par mail."
                 )
-            confirmees = sum(r["places"] for r in recs if r["statut"] == CONFIRMEE)
-            statut = CONFIRMEE if confirmees + places <= self.capacite else ATTENTE
+            std, pmr_conf = _totaux(recs)
+            ok = std + places <= self.capacite and pmr_conf + pmr <= self.capacite_pmr
+            statut = CONFIRMEE if ok else ATTENTE
             token = secrets.token_urlsafe(16)
-            rec_id = self.store.add(
-                {
-                    "nom": nom,
-                    "email": email,
-                    "telephone": telephone,
-                    "places": places,
-                    "statut": statut,
-                    "token": token,
-                }
-            )
+            champs = {
+                "prenom": prenom, "nom": nom, "email": email, "telephone": telephone,
+                "places": places, "pmr": pmr, "statut": statut, "token": token,
+            }
+            rec_id = self.store.add(champs)
             if statut == CONFIRMEE:
                 statut = self._verifier_jauge(rec_id)
-            rec = {
-                "id": rec_id, "nom": nom, "email": email, "telephone": telephone,
-                "places": places, "statut": statut, "token": token,
-            }
+            rec = {"id": rec_id, **champs, "statut": statut}
 
         fabrique = m.message_confirmation if statut == CONFIRMEE else m.message_attente
         return Resultat(statut, rec, self._envoyer(rec, *fabrique(rec, self.app_url)))
 
     def _verifier_jauge(self, rec_id):
         """Garde-fou si deux réservations arrivent en même temps depuis deux processus :
-        la plus récente (id le plus grand) passe en liste d'attente si la jauge déborde."""
-        cumul = 0
+        la plus récente (id le plus grand) passe en liste d'attente si une jauge déborde."""
+        cumul_std = cumul_pmr = 0
         for r in sorted(self.store.list(), key=lambda x: x["id"]):
             if r["statut"] != CONFIRMEE:
                 continue
-            cumul += r["places"]
+            cumul_std += r["places"]
+            cumul_pmr += r.get("pmr", 0)
             if r["id"] == rec_id:
-                if cumul > self.capacite:
+                if cumul_std > self.capacite or cumul_pmr > self.capacite_pmr:
                     self.store.update(rec_id, {"statut": ATTENTE})
                     return ATTENTE
                 return CONFIRMEE
@@ -150,12 +174,14 @@ class Billetterie:
 
     def _promouvoir(self):
         recs = self.store.list()
-        libres = self.capacite - sum(r["places"] for r in recs if r["statut"] == CONFIRMEE)
+        std, pmr = _totaux(recs)
+        libres_std, libres_pmr = self.capacite - std, self.capacite_pmr - pmr
         promus = []
         for r in sorted((r for r in recs if r["statut"] == ATTENTE), key=lambda x: x["id"]):
-            if r["places"] <= libres:
+            if r["places"] <= libres_std and r.get("pmr", 0) <= libres_pmr:
                 self.store.update(r["id"], {"statut": CONFIRMEE})
-                libres -= r["places"]
+                libres_std -= r["places"]
+                libres_pmr -= r.get("pmr", 0)
                 promus.append({**r, "statut": CONFIRMEE})
         return promus
 
@@ -163,9 +189,9 @@ class Billetterie:
         for r in promus:
             self._envoyer(r, *m.message_promotion(r, self.app_url))
 
-    def _envoyer(self, rec, sujet, corps):
+    def _envoyer(self, rec, *msg):
         try:
-            self.mailer.send(rec["email"], sujet, corps)
+            self.mailer.send(rec["email"], *msg)
             return True
         except Exception:
             return False

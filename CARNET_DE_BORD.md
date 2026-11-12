@@ -15,6 +15,13 @@
 - Erreur Grist 400 « Invalid column Cree » à la première réservation : la table réelle n'avait pas cette colonne.
 - Colonne `Cree` supprimée du code (inutile, l'ordre vient du numéro de ligne).
 
+## 2026-11-13 — Prénom/nom, PMR, mention des 10 places
+- Formulaire : prénom et nom séparés ; texte « Maximum 10 places par réservation (dont 2 PMR au plus) ».
+- 4 places PMR en plus des 300 : jauge séparée, mélange standard + PMR possible, max 2 PMR par réservation,
+  liste d'attente commune (FIFO), compteur PMR public.
+- La table Grist est complétée automatiquement (colonnes `Prenom`, `PMR`).
+- Logo : emplacement prêt (`assets/logo.png`), en attente du fichier.
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.

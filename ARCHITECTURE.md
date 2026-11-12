@@ -18,12 +18,16 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
 
 ## Table Grist « Reservations »
 
-`Nom`, `Email`, `Telephone`, `Places` (entier), `Statut` (`confirmee` / `attente` / `annulee`),
+`Prenom`, `Nom`, `Email`, `Telephone`, `Places` (places standard), `PMR` (places PMR), `Statut` (`confirmee` / `attente` / `annulee`),
 `Token` (secret du lien d'annulation). L'ordre d'arrivée est le numéro de ligne Grist.
 
 ## Règles
 
-- Réservation confirmée si `places confirmées + demande <= 300`, sinon liste d'attente.
+- Deux jauges : 300 places standard et 4 places PMR (en plus). Réservation confirmée si les deux jauges
+  suffisent, sinon liste d'attente (une même liste, promotion dans l'ordre d'arrivée).
+- Plafond par réservation : 10 places (PMR comprises), dont 2 PMR au plus.
+- Au démarrage, l'appli ajoute les colonnes manquantes à la table Grist (`assurer_colonnes`).
+- Logo : déposer `assets/logo.png`, il s'affiche en haut de la page.
 - Un verrou protège les réservations simultanées dans l'appli ; un contrôle après écriture
   rétrograde la plus récente en attente si deux processus ont débordé la jauge.
 - Annulation : statut `annulee`, puis promotion de la liste d'attente dans l'ordre d'arrivée

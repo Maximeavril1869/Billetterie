@@ -9,8 +9,10 @@ CONCERT = {
     "heure": "17h",
     "lieu": "Salle La 2Deuche, Lempdes",
 }
-CAPACITE = 300            # nombre total de places
-MAX_PAR_RESERVATION = 10  # plafond technique par réservation
+CAPACITE = 300            # places standard
+CAPACITE_PMR = 4          # places PMR, en plus des places standard
+MAX_PAR_RESERVATION = 10  # plafond par réservation (places standard + PMR)
+MAX_PMR_PAR_RESERVATION = 2  # dont PMR au maximum
 UNE_RESA_PAR_EMAIL = True  # une seule réservation active par adresse e-mail
 TABLE = "Reservations"     # nom de la table Grist
 # --------------------------------------------------------------------------

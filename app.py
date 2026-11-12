@@ -5,8 +5,11 @@ import streamlit as st
 
 from core.mailer import GmailMailer, NullMailer
 from core.service import Billetterie, ErreurReservation
+import os
+
 from core.settings import (
-    CAPACITE, CONCERT, MAX_PAR_RESERVATION, TABLE, UNE_RESA_PAR_EMAIL, secret,
+    CAPACITE, CAPACITE_PMR, CONCERT, MAX_PAR_RESERVATION, MAX_PMR_PAR_RESERVATION,
+    TABLE, UNE_RESA_PAR_EMAIL, secret,
 )
 from core.store import GristStore
 
@@ -23,13 +26,21 @@ def creer_service():
     )
     user, mdp = secret("GMAIL_USER"), secret("GMAIL_APP_PASSWORD")
     mailer = GmailMailer(user, mdp) if user and mdp else NullMailer()
+    try:
+        store.assurer_colonnes()  # ajoute Prenom, PMR... si la table est plus ancienne
+    except Exception:
+        pass
     return Billetterie(
         store, mailer, CAPACITE, MAX_PAR_RESERVATION,
         app_url=secret("APP_URL", ""), une_resa_par_email=UNE_RESA_PAR_EMAIL,
+        capacite_pmr=CAPACITE_PMR, max_pmr_par_resa=MAX_PMR_PAR_RESERVATION,
     )
 
 
 def entete():
+    logo = os.path.join(os.path.dirname(__file__), "assets", "logo.png")
+    if os.path.exists(logo):
+        st.image(logo, width=160)
     st.title(f"🎶 {CONCERT['titre']}")
     st.markdown(
         f"**{CONCERT['date']} à {CONCERT['heure']}**  \n"
@@ -45,7 +56,8 @@ def page_annulation(svc, token):
     if rec is None or rec["statut"] not in ("confirmee", "attente"):
         st.info("Cette réservation est introuvable ou déjà annulée.")
         return
-    st.write(f"Réservation au nom de **{rec['nom']}** : {rec['places']} place(s).")
+    detail = f"{rec['places']} place(s)" + (f" + {rec['pmr']} PMR" if rec["pmr"] else "")
+    st.write(f"Réservation au nom de **{rec['prenom']} {rec['nom']}** : {detail}.")
     if st.button("Confirmer l'annulation", type="primary"):
         try:
             svc.annuler(token)
@@ -106,6 +118,7 @@ def page_admin(svc):
     c1.metric("Places confirmées", f"{e.confirmees} / {e.capacite}")
     c2.metric("Places restantes", e.restantes)
     c3.metric("Demandes en attente", e.en_attente)
+    st.metric("Places PMR confirmées", f"{e.pmr_confirmees} / {e.capacite_pmr}")
     url = secret("GRIST_DOC_URL")
     if url:
         st.link_button("Ouvrir la liste dans Grist", url)
@@ -123,23 +136,32 @@ def page_publique(svc):
     compteur = st.container()
 
     st.subheader("Réserver")
+    st.caption(
+        f"Maximum **{MAX_PAR_RESERVATION} places par réservation** "
+        f"(dont {MAX_PMR_PAR_RESERVATION} places PMR au plus)."
+    )
     with st.form("resa", clear_on_submit=False):
-        nom = st.text_input("Nom et prénom")
+        prenom = st.text_input("Prénom")
+        nom = st.text_input("Nom")
         email = st.text_input("Adresse e-mail")
         tel = st.text_input("Téléphone (facultatif)")
         places = st.number_input(
-            "Nombre de places", min_value=1, max_value=MAX_PAR_RESERVATION, value=1, step=1
+            "Places standard", min_value=0, max_value=MAX_PAR_RESERVATION, value=1, step=1
+        )
+        pmr = st.number_input(
+            "Places PMR (personne à mobilité réduite)",
+            min_value=0, max_value=MAX_PMR_PAR_RESERVATION, value=0, step=1,
         )
         envoi = st.form_submit_button("Réserver", type="primary")
 
     if envoi:
         try:
-            res = svc.reserver(nom, email, tel, int(places))
+            res = svc.reserver(prenom, nom, email, tel, int(places), int(pmr))
             if res.statut == "confirmee":
                 st.success("✅ Réservation confirmée !")
             else:
                 st.warning(
-                    "Le concert est complet (ou presque) : vous êtes sur **liste d'attente**. "
+                    "Les places demandées ne sont plus toutes disponibles : vous êtes sur **liste d'attente**. "
                     "Vous serez prévenu par mail si des places se libèrent."
                 )
             if res.mail_ok:
@@ -163,6 +185,8 @@ def page_publique(svc):
                 st.warning("Complet — vous pouvez tout de même vous inscrire sur liste d'attente.")
             else:
                 st.markdown(f"**{e.restantes} places restantes** sur {e.capacite}")
+            if e.capacite_pmr:
+                st.markdown(f"♿ **{e.pmr_restantes} places PMR restantes** sur {e.capacite_pmr}")
         except Exception:
             st.caption("Compteur momentanément indisponible.")
 

@@ -36,15 +36,27 @@ def _infos():
     return f"{c['titre']}\n{c['date']} à {c['heure']}\n{c['lieu']}\nOrganisé par : {c['asso']}"
 
 
+def _qui(rec):
+    return f"{rec.get('prenom', '')} {rec['nom']}".strip()
+
+
+def _places_txt(rec):
+    parts = []
+    if rec["places"]:
+        parts.append(f"{rec['places']} place{'s' if rec['places'] > 1 else ''}")
+    if rec.get("pmr"):
+        parts.append(f"{rec['pmr']} place{'s' if rec['pmr'] > 1 else ''} PMR")
+    return " + ".join(parts)
+
+
 def _lien(app_url, token):
     return f"{app_url.rstrip('/')}/?annuler={token}" if app_url else f"(lien : ?annuler={token})"
 
 
 def message_confirmation(rec, app_url):
-    p = rec["places"]
     corps = (
-        f"Bonjour {rec['nom']},\n\n"
-        f"Votre réservation est CONFIRMÉE pour {p} place{'s' if p > 1 else ''} (gratuites).\n\n"
+        f"Bonjour {_qui(rec)},\n\n"
+        f"Votre réservation est CONFIRMÉE pour {_places_txt(rec)} (gratuites).\n\n"
         f"{_infos()}\n\n"
         "Aucun billet à imprimer : présentez-vous simplement à l'entrée avec votre nom.\n\n"
         f"Un empêchement ? Merci d'annuler pour libérer vos places :\n{_lien(app_url, rec['token'])}\n"
@@ -53,10 +65,9 @@ def message_confirmation(rec, app_url):
 
 
 def message_attente(rec, app_url):
-    p = rec["places"]
     corps = (
-        f"Bonjour {rec['nom']},\n\n"
-        f"Le concert est complet : votre demande de {p} place{'s' if p > 1 else ''} "
+        f"Bonjour {_qui(rec)},\n\n"
+        f"Les places demandées ne sont plus disponibles : votre demande de {_places_txt(rec)} "
         "est sur LISTE D'ATTENTE. Vous serez prévenu par mail si des places se libèrent.\n\n"
         f"{_infos()}\n\n"
         f"Pour retirer votre demande :\n{_lien(app_url, rec['token'])}\n"
@@ -65,11 +76,10 @@ def message_attente(rec, app_url):
 
 
 def message_promotion(rec, app_url):
-    p = rec["places"]
     corps = (
-        f"Bonjour {rec['nom']},\n\n"
-        f"Bonne nouvelle : des places se sont libérées, votre réservation de {p} "
-        f"place{'s' if p > 1 else ''} est maintenant CONFIRMÉE.\n\n"
+        f"Bonjour {_qui(rec)},\n\n"
+        f"Bonne nouvelle : des places se sont libérées, votre réservation de {_places_txt(rec)} "
+        f"est maintenant CONFIRMÉE.\n\n"
         f"{_infos()}\n\n"
         f"Un empêchement ? Merci d'annuler :\n{_lien(app_url, rec['token'])}\n"
     )
@@ -78,7 +88,7 @@ def message_promotion(rec, app_url):
 
 def message_annulation(rec, app_url):
     corps = (
-        f"Bonjour {rec['nom']},\n\n"
+        f"Bonjour {_qui(rec)},\n\n"
         "Votre réservation a bien été annulée.\n\n"
         f"{_infos()}\n"
     )

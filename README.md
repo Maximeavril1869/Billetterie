@@ -1,7 +1,7 @@
 # Billetterie
 
 Billetterie **gratuite** pour le Concert de la Sainte Cécile (Association des membres de l'OHL) :
-12 décembre 2026, 17h, salle La 2Deuche à Lempdes. 300 places.
+12 décembre 2026, 17h, salle La 2Deuche à Lempdes. 300 places standard + 4 places PMR.
 
 - Page publique avec compteur de places restantes et formulaire de réservation
 - Liste d'attente automatique quand c'est complet
@@ -31,7 +31,7 @@ Aucune donnée réelle ne doit être dans ce dépôt : les inscrits restent dans
 ## Réglages
 
 Dans `core/settings.py` : infos du concert, jauge (`CAPACITE`), plafond par réservation
-(`MAX_PAR_RESERVATION`), une réservation par e-mail (`UNE_RESA_PAR_EMAIL`).
+(`MAX_PAR_RESERVATION`), places PMR (`CAPACITE_PMR`, `MAX_PMR_PAR_RESERVATION`), une réservation par e-mail (`UNE_RESA_PAR_EMAIL`).
 
 ## Tests
 
