@@ -63,6 +63,10 @@ def diagnostic_grist(exc):
         return "(erreur 404) Document introuvable : vérifie GRIST_DOC_ID et GRIST_SERVER (site d'équipe = https://ton-equipe.getgrist.com)."
     if code:
         return f"(erreur HTTP {code})"
+    if "JSONDecodeError" in type(exc).__name__:
+        return ("Grist a répondu par une page web et non par des données : GRIST_SERVER est "
+                "probablement incorrect. Il doit contenir uniquement https://docs.getgrist.com "
+                "(ou https://ton-equipe.getgrist.com), sans chemin, sans / ni espace à la fin.")
     return f"({type(exc).__name__}) Vérifie GRIST_SERVER et que les 3 valeurs GRIST_* sont bien renseignées, sans espace ni guillemet en trop."
 
 
