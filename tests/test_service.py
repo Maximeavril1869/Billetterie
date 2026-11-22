@@ -7,6 +7,9 @@ from core.service import Billetterie, ErreurReservation
 from tests.fake_store import FakeStore
 
 
+TEL = "06 12 34 56 78"
+
+
 def fabrique(capacite=10, max_resa=10, une_par_email=True, pmr=4, max_pmr=2):
     store, mailer = FakeStore(), NullMailer()
     return (Billetterie(store, mailer, capacite, max_resa, "https://x.app", une_par_email,
@@ -14,12 +17,12 @@ def fabrique(capacite=10, max_resa=10, une_par_email=True, pmr=4, max_pmr=2):
 
 
 def res(b, n, places=1, pmr=0):
-    return b.reserver("Prénom", n, f"{n.lower()}@ex.fr", "", places, pmr)
+    return b.reserver("Prénom", n, f"{n.lower()}@ex.fr", TEL, places, pmr)
 
 
 def test_reservation_confirmee_et_compteur():
     b, _, mailer = fabrique()
-    r = b.reserver("Ana", "Test", "ana@ex.fr", "", 3)
+    r = b.reserver("Ana", "Test", "ana@ex.fr", TEL, 3)
     assert r.statut == "confirmee" and r.mail_ok
     assert b.etat().restantes == 7
     assert "annuler=" in mailer.envoyes[0][2] and "Ana Test" in mailer.envoyes[0][2]
@@ -106,19 +109,19 @@ def test_annuler_deux_fois_ou_token_inconnu():
 def test_validation(prenom, nom, email, places, pmr):
     b, _, _ = fabrique()
     with pytest.raises(ErreurReservation):
-        b.reserver(prenom, nom, email, "", places, pmr)
+        b.reserver(prenom, nom, email, TEL, places, pmr)
 
 
 def test_total_10_pmr_comprises_ok():
     b, _, _ = fabrique(capacite=50)
-    assert b.reserver("P", "A", "a@ex.fr", "", 8, 2).statut == "confirmee"
+    assert b.reserver("P", "A", "a@ex.fr", TEL, 8, 2).statut == "confirmee"
 
 
 def test_doublon_email():
     b, _, _ = fabrique()
     res(b, "A")
     with pytest.raises(ErreurReservation):
-        b.reserver("P", "A2", "A@EX.fr", "", 1)
+        b.reserver("P", "A2", "A@EX.fr", TEL, 1)
     b2, _, _ = fabrique(une_par_email=False)
     res(b2, "A")
     res(b2, "A")
@@ -136,7 +139,7 @@ def test_echec_mail_ne_bloque_pas():
 def test_concurrence_ne_depasse_jamais_les_jauges():
     b, _, _ = fabrique(capacite=50, max_resa=10, pmr=4)
     def go(i):
-        b.reserver("P", f"N{i}", f"n{i}@ex.fr", "", 3, 1 if i % 2 else 0)
+        b.reserver("P", f"N{i}", f"n{i}@ex.fr", TEL, 3, 1 if i % 2 else 0)
     ts = [threading.Thread(target=go, args=(i,)) for i in range(40)]
     [t.start() for t in ts]
     [t.join() for t in ts]
@@ -201,3 +204,39 @@ def test_annulation_partielle_en_attente_peut_etre_promue():
     assert c.statut == "attente"
     rec, _ = b.retirer_places(c.reservation["token"], 2)   # reste 1 place -> rentre
     assert rec["statut"] == "confirmee" and b.etat().confirmees == 5
+
+
+def test_telephone_obligatoire_et_valide():
+    b, _, _ = fabrique()
+    for tel in ["", "   ", "abc", "123"]:
+        with pytest.raises(ErreurReservation):
+            b.reserver("P", "A", "a@ex.fr", tel, 1)
+    assert b.reserver("P", "A", "a@ex.fr", "+33 6 12 34 56 78", 1).statut == "confirmee"
+
+
+def test_observations_enregistrees_et_rappelees_dans_le_mail():
+    b, store, mailer = fabrique()
+    b.reserver("Ana", "Test", "ana@ex.fr", TEL, 2, 0, "  Besoin d'un\n placement en bout de rang ")
+    assert store.recs[0]["observations"] == "Besoin d'un placement en bout de rang"
+    corps = mailer.envoyes[0][2]
+    assert "Besoin d'un placement en bout de rang" in corps
+    assert "Nous vous rappellerons au 06 12 34 56 78" in corps
+
+
+def test_sans_observation_pas_de_rappel_dans_le_mail():
+    b, _, mailer = fabrique()
+    b.reserver("Ana", "Test", "ana@ex.fr", TEL, 2)
+    assert "Votre observation" not in mailer.envoyes[0][2]
+
+
+def test_observations_trop_longues():
+    b, _, _ = fabrique()
+    with pytest.raises(ErreurReservation):
+        b.reserver("P", "A", "a@ex.fr", TEL, 1, 0, "x" * 301)
+
+
+def test_mail_indique_portes_et_placement_libre():
+    b, _, mailer = fabrique()
+    b.reserver("Ana", "Test", "ana@ex.fr", TEL, 1)
+    corps = mailer.envoyes[0][2]
+    assert "ouverture des portes à 16h" in corps and "Placement libre" in corps

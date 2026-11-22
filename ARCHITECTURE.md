@@ -18,7 +18,7 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
 
 ## Table Grist « Reservations »
 
-`Prenom`, `Nom`, `Email`, `Telephone`, `Places` (places standard), `PMR` (places PMR), `Statut` (`confirmee` / `attente` / `annulee`),
+`Prenom`, `Nom`, `Email`, `Telephone`, `Places` (places standard), `PMR` (places PMR), `Observations` (texte libre facultatif, 300 caractères max), `Statut` (`confirmee` / `attente` / `annulee`),
 `Token` (secret du lien d'annulation), `DateCommande` (date et heure de la commande, à titre d'info). L'ordre d'arrivée est le numéro de ligne Grist.
 
 ## Règles
@@ -26,6 +26,8 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
 - Deux jauges : 300 places standard et 4 places PMR (en plus). Réservation confirmée si les deux jauges
   suffisent, sinon liste d'attente (une même liste, promotion dans l'ordre d'arrivée).
 - Plafond par réservation : 10 places (PMR comprises), dont 2 PMR au plus.
+- Téléphone obligatoire (9 à 15 chiffres) : l'asso rappelle toute personne ayant saisi une observation. L'observation est rappelée dans les mails de confirmation, d'attente, de promotion et de modification.
+- Infos affichées en en-tête et dans les mails : ouverture des portes à 16h, placement libre (valeurs dans `core/settings.py`, dictionnaire `CONCERT`).
 - Au démarrage, l'appli ajoute les colonnes manquantes à la table Grist (`assurer_colonnes`).
 - Logo : `assets/logo.svg` inséré en SVG en ligne à côté du titre ; « OHL » utilise `currentColor`, donc suit le thème clair/sombre (`logo-blanc.svg` n'est plus utilisé).
 - Le service (`creer_service`) est mis en cache avec la date de modification du code comme clé, pour qu'un redéploiement ne garde pas un ancien objet.

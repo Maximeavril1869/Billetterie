@@ -6,10 +6,12 @@ import time
 from dataclasses import dataclass
 
 from . import mailer as m
+from .settings import MAX_OBSERVATIONS
 
 CONFIRMEE, ATTENTE, ANNULEE = "confirmee", "attente", "annulee"
 ACTIVES = (CONFIRMEE, ATTENTE)
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
+TEL_RE = re.compile(r"^\+?[0-9 .()\-]{9,25}$")
 
 # Un seul verrou pour tout le processus (Streamlit exécute chaque visiteur dans un thread).
 _VERROU = threading.Lock()
@@ -89,15 +91,21 @@ class Billetterie:
         return None
 
     # ---------- réservation ----------
-    def reserver(self, prenom, nom, email, telephone, places, pmr=0):
+    def reserver(self, prenom, nom, email, telephone, places, pmr=0, observations=""):
         prenom = (prenom or "").strip()
         nom = (nom or "").strip()
         email = (email or "").strip().lower()
         telephone = (telephone or "").strip()
+        observations = " ".join((observations or "").split())
         if not prenom or not nom or len(prenom) > 100 or len(nom) > 100:
             raise ErreurReservation("Merci d'indiquer votre prénom et votre nom.")
         if not EMAIL_RE.match(email) or len(email) > 200:
             raise ErreurReservation("L'adresse e-mail n'est pas valide.")
+        chiffres = sum(c.isdigit() for c in telephone)
+        if not TEL_RE.match(telephone) or not 9 <= chiffres <= 15:
+            raise ErreurReservation("Merci d'indiquer un numéro de téléphone valide (nous pouvons avoir à vous rappeler).")
+        if len(observations) > MAX_OBSERVATIONS:
+            raise ErreurReservation(f"Les observations sont limitées à {MAX_OBSERVATIONS} caractères.")
         if not isinstance(places, int) or not isinstance(pmr, int) or places < 0 or pmr < 0:
             raise ErreurReservation("Nombre de places invalide.")
         if pmr > self.max_pmr_par_resa:
@@ -124,7 +132,8 @@ class Billetterie:
             token = secrets.token_urlsafe(16)
             champs = {
                 "prenom": prenom, "nom": nom, "email": email, "telephone": telephone,
-                "places": places, "pmr": pmr, "statut": statut, "token": token,
+                "places": places, "pmr": pmr, "observations": observations,
+                "statut": statut, "token": token,
                 "cree": int(time.time()),
             }
             rec_id = self.store.add(champs)

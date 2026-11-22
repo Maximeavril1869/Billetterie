@@ -33,7 +33,20 @@ class NullMailer:
 
 def _infos():
     c = CONCERT
-    return f"{c['titre']}\n{c['date']} à {c['heure']}\n{c['lieu']}\nOrganisé par : {c['asso']}"
+    return (
+        f"{c['titre']}\n{c['date']} à {c['heure']} (ouverture des portes à {c['portes']})\n"
+        f"{c['lieu']}\nPlacement {c['placement']}\nOrganisé par : {c['asso']}"
+    )
+
+
+def _obs(rec):
+    """Rappelle l'observation saisie, et prévient qu'on rappellera la personne."""
+    obs = (rec.get("observations") or "").strip()
+    if not obs:
+        return ""
+    tel = rec.get("telephone") or ""
+    suite = f" au {tel}" if tel else ""
+    return f"\nVotre observation : « {obs} »\nNous vous rappellerons{suite} pour en parler.\n"
 
 
 def _qui(rec):
@@ -57,7 +70,7 @@ def message_confirmation(rec, app_url):
     corps = (
         f"Bonjour {_qui(rec)},\n\n"
         f"Votre réservation est CONFIRMÉE pour {_places_txt(rec)} (gratuites).\n\n"
-        f"{_infos()}\n\n"
+        f"{_infos()}\n{_obs(rec)}\n"
         "Aucun billet à imprimer : présentez-vous simplement à l'entrée avec votre nom.\n\n"
         f"Un empêchement ? Merci d'annuler pour libérer vos places :\n{_lien(app_url, rec['token'])}\n"
     )
@@ -69,7 +82,7 @@ def message_attente(rec, app_url):
         f"Bonjour {_qui(rec)},\n\n"
         f"Les places demandées ne sont plus disponibles : votre demande de {_places_txt(rec)} "
         "est sur LISTE D'ATTENTE. Vous serez prévenu par mail si des places se libèrent.\n\n"
-        f"{_infos()}\n\n"
+        f"{_infos()}\n{_obs(rec)}\n"
         f"Pour retirer votre demande :\n{_lien(app_url, rec['token'])}\n"
     )
     return f"Liste d'attente - {CONCERT['titre']}", corps
@@ -80,7 +93,7 @@ def message_promotion(rec, app_url):
         f"Bonjour {_qui(rec)},\n\n"
         f"Bonne nouvelle : des places se sont libérées, votre réservation de {_places_txt(rec)} "
         f"est maintenant CONFIRMÉE.\n\n"
-        f"{_infos()}\n\n"
+        f"{_infos()}\n{_obs(rec)}\n"
         f"Un empêchement ? Merci d'annuler :\n{_lien(app_url, rec['token'])}\n"
     )
     return f"Places disponibles : réservation confirmée - {CONCERT['titre']}", corps
@@ -101,7 +114,7 @@ def message_modification(rec, app_url):
         f"Bonjour {_qui(rec)},\n\n"
         f"Votre réservation a été modifiée : il vous reste {_places_txt(rec)} (réservation {etat}).\n"
         "Votre rang d'arrivée est conservé.\n\n"
-        f"{_infos()}\n\n"
+        f"{_infos()}\n{_obs(rec)}\n"
         f"Pour modifier ou annuler à nouveau :\n{_lien(app_url, rec['token'])}\n"
     )
     return f"Réservation modifiée - {CONCERT['titre']}", corps

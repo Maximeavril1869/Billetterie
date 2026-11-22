@@ -28,10 +28,13 @@ def test_page_publique_et_reservation(monkeypatch):
     at.text_input[0].set_value("Ana")
     at.text_input[1].set_value("Test")
     at.text_input[2].set_value("ana@example.fr")
+    at.text_input[3].set_value("0612345678")
     at.number_input[0].set_value(4)
     at.number_input[1].set_value(1)
+    at.text_area[0].set_value("Fauteuil roulant")
     at.button[0].click().run()
     assert not at.exception
+    assert store.recs[0]["observations"] == "Fauteuil roulant"
     assert any("confirmée" in s.value for s in at.success)
     assert store.recs[0]["places"] == 4 and store.recs[0]["pmr"] == 1
     assert "3 places PMR restantes" in " ".join(m.value for m in at.markdown)
@@ -46,6 +49,7 @@ def test_annulation_par_lien(monkeypatch):
     at.text_input[0].set_value("Ana")
     at.text_input[1].set_value("Test")
     at.text_input[2].set_value("ana@example.fr")
+    at.text_input[3].set_value("0612345678")
     at.button[0].click().run()
     token = store.recs[0]["token"]
     st.cache_resource.clear()
@@ -72,6 +76,7 @@ def test_page_annulation_partielle(monkeypatch):
     at.text_input[0].set_value("Ana")
     at.text_input[1].set_value("Test")
     at.text_input[2].set_value("ana@example.fr")
+    at.text_input[3].set_value("0612345678")
     at.number_input[0].set_value(10)
     at.button[0].click().run()
     token = store.recs[0]["token"]
@@ -91,3 +96,12 @@ def test_entete_avec_logo(monkeypatch):
     st.cache_resource.clear()
     at, _ = lancer(monkeypatch)
     assert any('<svg class="logo"' in m.value and "currentColor" in m.value for m in at.markdown)
+
+
+def test_entete_portes_et_placement_libre(monkeypatch):
+    import streamlit as st
+    st.cache_resource.clear()
+    at, _ = lancer(monkeypatch)
+    texte = " ".join(m.value for m in at.markdown)
+    assert "ouverture des portes à 16h" in texte and "placement libre" in texte
+    assert any("placement est libre" in c.value for c in at.caption)

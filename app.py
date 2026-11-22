@@ -9,7 +9,7 @@ from core.service import Billetterie, ErreurReservation
 import os
 
 from core.settings import (
-    CAPACITE, CAPACITE_PMR, CONCERT, MAX_PAR_RESERVATION, MAX_PMR_PAR_RESERVATION,
+    CAPACITE, CAPACITE_PMR, CONCERT, MAX_OBSERVATIONS, MAX_PAR_RESERVATION, MAX_PMR_PAR_RESERVATION,
     TABLE, UNE_RESA_PAR_EMAIL, secret,
 )
 from core.store import GristStore
@@ -72,8 +72,10 @@ def entete():
 .ent .sous{margin-top:8px;font-size:.98rem;line-height:1.55;opacity:.9}
 </style>"""
         f'<div class="ent">{_logo_svg()}<div><div class="titre">🎶 {CONCERT["titre"]}</div>'
-        f'<div class="sous"><b>{CONCERT["date"]} à {CONCERT["heure"]}</b><br>'
-        f'📍 {CONCERT["lieu"]}<br>{CONCERT["asso"]} — entrée libre, réservation gratuite'
+        f'<div class="sous"><b>{CONCERT["date"]} à {CONCERT["heure"]}</b> — '
+        f'ouverture des portes à {CONCERT["portes"]}<br>'
+        f'📍 {CONCERT["lieu"]} — placement {CONCERT["placement"]}<br>'
+        f'{CONCERT["asso"]} — entrée libre, réservation gratuite'
         "</div></div></div>",
         unsafe_allow_html=True,
     )
@@ -191,7 +193,7 @@ def page_publique(svc):
         prenom = st.text_input("Prénom")
         nom = st.text_input("Nom")
         email = st.text_input("Adresse e-mail")
-        tel = st.text_input("Téléphone (facultatif)")
+        tel = st.text_input("Téléphone")
         places = st.number_input(
             "Places standard", min_value=0, max_value=MAX_PAR_RESERVATION, value=1, step=1
         )
@@ -199,11 +201,18 @@ def page_publique(svc):
             "Places PMR (personne à mobilité réduite)",
             min_value=0, max_value=MAX_PMR_PAR_RESERVATION, value=0, step=1,
         )
+        observations = st.text_area(
+            "Observations (facultatif)", max_chars=MAX_OBSERVATIONS,
+        )
+        st.caption(
+            "Le placement est libre. Si votre situation demande un placement particulier, "
+            "indiquez-le ici : nous vous rappellerons pour en parler."
+        )
         envoi = st.form_submit_button("Réserver", type="primary")
 
     if envoi:
         try:
-            res = svc.reserver(prenom, nom, email, tel, int(places), int(pmr))
+            res = svc.reserver(prenom, nom, email, tel, int(places), int(pmr), observations)
             if res.statut == "confirmee":
                 st.success("✅ Réservation confirmée !")
             else:

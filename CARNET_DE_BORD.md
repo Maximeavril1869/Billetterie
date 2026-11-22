@@ -41,6 +41,14 @@
   dont le texte prend la couleur du thème (`currentColor`) : plus de détection de thème. `logo-blanc.svg` n'est plus utilisé.
 - Test d'en-tête adapté (33 tests OK).
 
+## 2026-11-22 — Observations, téléphone obligatoire, portes et placement
+- Nouvelle colonne Grist `Observations` (champ libre facultatif, 300 caractères max), ajoutée automatiquement au démarrage.
+  Si elle est remplie, l'asso rappelle la personne : le mail reprend l'observation et annonce le rappel.
+- Téléphone désormais obligatoire et contrôlé (9 à 15 chiffres).
+- En-tête et mails : « ouverture des portes à 16h » et « placement libre » ; sous le champ Observations, mention du placement
+  libre et du rappel pour un placement particulier (rien dans les mails sur le remplissage de la case : la réservation est faite).
+- 6 tests ajoutés (39 tests OK).
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.
