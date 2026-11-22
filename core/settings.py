@@ -9,6 +9,7 @@ CONCERT = {
     "heure": "17h",
     "portes": "16h",
     "placement": "libre",
+    "suppression_donnees": "31 décembre 2026",
     "lieu": "Salle La 2Deuche, Lempdes",
 }
 CAPACITE = 300            # places standard

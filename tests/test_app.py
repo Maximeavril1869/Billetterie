@@ -129,3 +129,14 @@ def test_menu_streamlit_masque(monkeypatch):
     st.cache_resource.clear()
     at, _ = lancer(monkeypatch)
     assert any("#MainMenu" in m.value and "display:none" in m.value for m in at.markdown)
+
+
+def test_mention_donnees_avec_contact_gmail(monkeypatch):
+    import streamlit as st
+    st.cache_resource.clear()
+    monkeypatch.delenv("GMAIL_APP_PASSWORD", raising=False)
+    at, _ = lancer(monkeypatch, secrets={"GMAIL_USER": "asso@gmail.com"})
+    mention = " ".join(c.value for c in at.caption)
+    assert "31 décembre 2026" in mention
+    assert "répondez simplement au mail de confirmation" in mention
+    assert "asso@gmail.com" in mention

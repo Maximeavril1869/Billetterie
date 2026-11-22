@@ -41,3 +41,5 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
 - Si l'envoi du mail échoue, la réservation reste enregistrée et le visiteur est prévenu.
 - Les noms et e-mails ne sont jamais affichés publiquement.
 - Visiteurs : menu/barre Streamlit masqués (`.streamlit/config.toml` `toolbarMode="minimal"` + CSS) ; les erreurs techniques vont dans les logs, pas à l'écran.
+
+- Mention de protection des données sous le formulaire (`mention_donnees()` dans `app.py`) : contact = adresse `GMAIL_USER`, suppression au 31/12/2026 (`settings.py`).

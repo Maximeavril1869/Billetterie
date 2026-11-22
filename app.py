@@ -88,6 +88,21 @@ def entete():
     )
 
 
+def mention_donnees():
+    """Mention de protection des données ; le contact est l'adresse Gmail d'envoi des mails."""
+    contact = secret("GMAIL_USER")
+    fin = (
+        "Pour toute demande (accès, modification, suppression), répondez simplement "
+        "au mail de confirmation"
+        + (f" ou écrivez à {contact}." if contact else ".")
+    )
+    return (
+        "Les informations saisies (nom, prénom, e-mail, téléphone, observations) servent "
+        "uniquement à gérer les réservations de ce concert. Elles ne sont pas transmises à des tiers "
+        f"et seront supprimées au plus tard le {CONCERT['suppression_donnees']}. " + fin
+    )
+
+
 def page_annulation(svc, token):
     entete()
     st.subheader("Modifier ou annuler une réservation")
@@ -216,6 +231,8 @@ def page_publique(svc):
             "indiquez-le ici : nous vous rappellerons pour en parler."
         )
         envoi = st.form_submit_button("Réserver", type="primary")
+
+    st.caption(mention_donnees())
 
     if envoi:
         try:
