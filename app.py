@@ -209,7 +209,9 @@ def page_publique(svc):
     st.subheader("Réserver")
     st.caption(
         f"Maximum **{MAX_PAR_RESERVATION} places par réservation** "
-        f"(dont {MAX_PMR_PAR_RESERVATION} places PMR au plus)."
+        f"(dont {MAX_PMR_PAR_RESERVATION} places PMR au plus). "
+        "Chaque personne, enfants compris, compte pour une place. "
+        "Un bracelet vous sera remis à l'entrée pour accéder à la salle."
     )
     with st.form("resa", clear_on_submit=False):
         prenom = st.text_input("Prénom")

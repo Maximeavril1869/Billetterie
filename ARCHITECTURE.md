@@ -44,3 +44,4 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
 
 - Mention de protection des données sous le formulaire (`mention_donnees()` dans `app.py`) : contact = adresse `GMAIL_USER`, suppression au 31/12/2026 (`settings.py`).
 - Mails de réservation confirmée : mention du bracelet remis à l'entrée (`BRACELET` dans `core/mailer.py`).
+- Formulaire : une seule légende regroupe plafond, règle « un enfant = une place » et bracelet, pour ne pas multiplier les blocs d'information.

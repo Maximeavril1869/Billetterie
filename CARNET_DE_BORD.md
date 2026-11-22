@@ -61,6 +61,9 @@
 ## 2026-11-22 — Bracelet
 - Mails de réservation confirmée, de promotion et de modification (si confirmée) : « Un bracelet vous sera remis à l'entrée pour accéder à la salle ».
 
+## 2026-11-22 — Infos sous le titre du formulaire
+- Une seule phrase d'information au-dessus du formulaire : plafond de 10 places, un enfant compte pour une place, bracelet remis à l'entrée.
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.

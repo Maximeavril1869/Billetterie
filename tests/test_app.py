@@ -38,7 +38,7 @@ def test_page_publique_et_reservation(monkeypatch):
     assert any("confirmée" in s.value for s in at.success)
     assert store.recs[0]["places"] == 4 and store.recs[0]["pmr"] == 1
     assert "3 places PMR restantes" in " ".join(m.value for m in at.markdown)
-    assert any("Maximum" in c.value for c in at.caption)
+    assert any("Maximum" in c.value and "enfants compris" in c.value and "bracelet" in c.value for c in at.caption)
     assert "296 places restantes" in " ".join(m.value for m in at.markdown)
 
 
