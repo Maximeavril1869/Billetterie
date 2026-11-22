@@ -58,6 +58,9 @@
 - Mention sous le formulaire : usage limité au concert, aucun tiers, suppression au plus tard le 31 décembre 2026
   (`CONCERT["suppression_donnees"]`), contact = répondre au mail de confirmation ou écrire à l'adresse Gmail (`GMAIL_USER`, lue dans les secrets).
 
+## 2026-11-22 — Bracelet
+- Mails de réservation confirmée, de promotion et de modification (si confirmée) : « Un bracelet vous sera remis à l'entrée pour accéder à la salle ».
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.

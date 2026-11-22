@@ -43,3 +43,4 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
 - Visiteurs : menu/barre Streamlit masqués (`.streamlit/config.toml` `toolbarMode="minimal"` + CSS) ; les erreurs techniques vont dans les logs, pas à l'écran.
 
 - Mention de protection des données sous le formulaire (`mention_donnees()` dans `app.py`) : contact = adresse `GMAIL_USER`, suppression au 31/12/2026 (`settings.py`).
+- Mails de réservation confirmée : mention du bracelet remis à l'entrée (`BRACELET` dans `core/mailer.py`).

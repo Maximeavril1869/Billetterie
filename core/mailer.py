@@ -39,6 +39,9 @@ def _infos():
     )
 
 
+BRACELET = "Un bracelet vous sera remis à l'entrée pour accéder à la salle."
+
+
 def _obs(rec):
     """Rappelle l'observation saisie, et prévient qu'on rappellera la personne."""
     obs = (rec.get("observations") or "").strip()
@@ -71,7 +74,8 @@ def message_confirmation(rec, app_url):
         f"Bonjour {_qui(rec)},\n\n"
         f"Votre réservation est CONFIRMÉE pour {_places_txt(rec)} (gratuites).\n\n"
         f"{_infos()}\n{_obs(rec)}\n"
-        "Aucun billet à imprimer : présentez-vous simplement à l'entrée avec votre nom.\n\n"
+        "Aucun billet à imprimer : présentez-vous simplement à l'entrée avec votre nom.\n"
+        f"{BRACELET}\n\n"
         f"Un empêchement ? Merci d'annuler pour libérer vos places :\n{_lien(app_url, rec['token'])}\n"
     )
     return f"Réservation confirmée - {CONCERT['titre']}", corps
@@ -94,6 +98,7 @@ def message_promotion(rec, app_url):
         f"Bonne nouvelle : des places se sont libérées, votre réservation de {_places_txt(rec)} "
         f"est maintenant CONFIRMÉE.\n\n"
         f"{_infos()}\n{_obs(rec)}\n"
+        f"{BRACELET}\n\n"
         f"Un empêchement ? Merci d'annuler :\n{_lien(app_url, rec['token'])}\n"
     )
     return f"Places disponibles : réservation confirmée - {CONCERT['titre']}", corps
@@ -110,11 +115,13 @@ def message_annulation(rec, app_url):
 
 def message_modification(rec, app_url):
     etat = "CONFIRMÉE" if rec["statut"] == "confirmee" else "toujours sur LISTE D'ATTENTE"
+    bracelet = f"{BRACELET}\n\n" if rec["statut"] == "confirmee" else ""
     corps = (
         f"Bonjour {_qui(rec)},\n\n"
         f"Votre réservation a été modifiée : il vous reste {_places_txt(rec)} (réservation {etat}).\n"
         "Votre rang d'arrivée est conservé.\n\n"
         f"{_infos()}\n{_obs(rec)}\n"
+        f"{bracelet}"
         f"Pour modifier ou annuler à nouveau :\n{_lien(app_url, rec['token'])}\n"
     )
     return f"Réservation modifiée - {CONCERT['titre']}", corps

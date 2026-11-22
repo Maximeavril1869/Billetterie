@@ -240,3 +240,14 @@ def test_mail_indique_portes_et_placement_libre():
     b.reserver("Ana", "Test", "ana@ex.fr", TEL, 1)
     corps = mailer.envoyes[0][2]
     assert "ouverture des portes à 16h" in corps and "Placement libre" in corps
+
+
+def test_bracelet_dans_les_mails_confirmes_seulement():
+    b, _, mailer = fabrique(capacite=3)
+    b.reserver("Ana", "Test", "ana@ex.fr", TEL, 2)
+    assert "bracelet" in mailer.envoyes[0][2]
+    b.reserver("Bob", "Test", "bob@ex.fr", TEL, 2)  # liste d'attente
+    assert "bracelet" not in mailer.envoyes[1][2]
+    token = b.store.list()[0]["token"]
+    b.annuler(token)  # promeut Bob
+    assert any("bracelet" in corps for _, sujet, corps in mailer.envoyes if "Places disponibles" in sujet)
