@@ -2,6 +2,8 @@
 import smtplib
 from email.message import EmailMessage
 
+from urllib.parse import quote_plus
+
 from .settings import CONCERT
 
 
@@ -35,8 +37,16 @@ def _infos():
     c = CONCERT
     return (
         f"{c['titre']}\n{c['date']} à {c['heure']} (ouverture des portes à {c['portes']})\n"
-        f"{c['lieu']}\nPlacement {c['placement']}\nOrganisé par : {c['asso']}"
+        f"{c['lieu']}\n{c['adresse']}\nPlan d'accès : {_lien_plan()}\n"
+        f"Placement {c['placement']}\nOrganisé par : {c['asso']}"
     )
+
+
+def _lien_plan():
+    """Lien Google Maps vers la salle (cliquable dans les mails)."""
+    c = CONCERT
+    requete = quote_plus(f"{c['lieu'].split(',')[0].replace('Salle ', '')} {c['adresse']}")
+    return f"https://www.google.com/maps/search/?api=1&query={requete}"
 
 
 BRACELET = "Un bracelet vous sera remis à l'entrée pour accéder à la salle."

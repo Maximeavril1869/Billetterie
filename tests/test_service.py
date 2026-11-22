@@ -240,6 +240,8 @@ def test_mail_indique_portes_et_placement_libre():
     b.reserver("Ana", "Test", "ana@ex.fr", TEL, 1)
     corps = mailer.envoyes[0][2]
     assert "ouverture des portes à 16h" in corps and "Placement libre" in corps
+    assert "14 rue Alexandre Vialatte, 63370 Lempdes" in corps
+    assert "https://www.google.com/maps/search/?api=1&query=La+2Deuche+14+rue+Alexandre+Vialatte%2C+63370+Lempdes" in corps
 
 
 def test_bracelet_dans_les_mails_confirmes_seulement():

@@ -12,6 +12,7 @@ CONCERT = {
     "placement": "libre",
     "suppression_donnees": "31 décembre 2026",
     "lieu": "Salle La 2Deuche, Lempdes",
+    "adresse": "14 rue Alexandre Vialatte, 63370 Lempdes",
 }
 CAPACITE = 300            # places standard
 CAPACITE_PMR = 4          # places PMR, en plus des places standard

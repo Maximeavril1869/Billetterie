@@ -67,6 +67,9 @@
 ## 2026-11-22 — En-tête réordonné
 - Logo inchangé à gauche ; à droite : nom complet de l'orchestre (OHL), intitulé du concert, date et ouverture des portes, lieu et entrée libre, placement libre.
 
+## 2026-11-22 — Plan d'accès dans les mails
+- Les mails donnent l'adresse de la salle (14 rue Alexandre Vialatte, 63370 Lempdes) et un lien Google Maps cliquable (`_lien_plan()`).
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.
