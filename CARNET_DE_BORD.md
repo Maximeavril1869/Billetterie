@@ -70,6 +70,11 @@
 ## 2026-11-22 — Plan d'accès dans les mails
 - Les mails donnent l'adresse de la salle (14 rue Alexandre Vialatte, 63370 Lempdes) et un lien Google Maps cliquable (`_lien_plan()`).
 
+## 2026-11-22 — Lien public
+- Sous-domaine choisi par l'utilisateur : `https://ohl-sainte-cecile-2026.streamlit.app` (Streamlit > Settings > General).
+- À faire côté secrets : `APP_URL` = ce lien, sans `/` final. Des mails réels avaient déjà été envoyés avec l'ancien lien :
+  leurs liens d'annulation sont périmés (à vérifier).
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.
