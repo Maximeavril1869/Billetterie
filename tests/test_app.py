@@ -105,3 +105,27 @@ def test_entete_portes_et_placement_libre(monkeypatch):
     texte = " ".join(m.value for m in at.markdown)
     assert "ouverture des portes à 16h" in texte and "placement libre" in texte
     assert any("placement est libre" in c.value for c in at.caption)
+
+
+def test_erreur_technique_sans_detail_pour_le_visiteur(monkeypatch):
+    import streamlit as st
+    st.cache_resource.clear()
+    at, store = lancer(monkeypatch)
+
+    def casse(*a, **k):
+        raise RuntimeError("secret interne")
+    store.add = casse
+    at.text_input[0].set_value("Ana")
+    at.text_input[1].set_value("Test")
+    at.text_input[2].set_value("ana@example.fr")
+    at.text_input[3].set_value("0612345678")
+    at.button[0].click().run()
+    assert any("erreur technique" in e.value for e in at.error)
+    assert not any("Détail" in c.value or "secret interne" in c.value for c in at.caption)
+
+
+def test_menu_streamlit_masque(monkeypatch):
+    import streamlit as st
+    st.cache_resource.clear()
+    at, _ = lancer(monkeypatch)
+    assert any("#MainMenu" in m.value and "display:none" in m.value for m in at.markdown)

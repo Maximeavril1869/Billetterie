@@ -40,3 +40,4 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
 - Annuler à la main dans Grist ne prévient personne : utiliser le bouton « Promouvoir la liste d'attente » de la page admin.
 - Si l'envoi du mail échoue, la réservation reste enregistrée et le visiteur est prévenu.
 - Les noms et e-mails ne sont jamais affichés publiquement.
+- Visiteurs : menu/barre Streamlit masqués (`.streamlit/config.toml` `toolbarMode="minimal"` + CSS) ; les erreurs techniques vont dans les logs, pas à l'écran.

@@ -1,5 +1,6 @@
 """Billetterie gratuite : page publique de réservation, annulation par lien, page admin."""
 import hmac
+import logging
 import re
 
 import streamlit as st
@@ -15,6 +16,12 @@ from core.settings import (
 from core.store import GristStore
 
 st.set_page_config(page_title=CONCERT["titre"], page_icon="🎶")
+# Visiteurs : pas de menu Streamlit, ni barre du haut, ni pied de page.
+st.markdown(
+    "<style>#MainMenu,footer,[data-testid='stToolbar'],[data-testid='stDecoration']"
+    "{display:none!important;visibility:hidden}</style>",
+    unsafe_allow_html=True,
+)
 
 
 def _version_code():
@@ -231,7 +238,7 @@ def page_publique(svc):
             st.error(str(err))
         except Exception as exc:
             st.error("Une erreur technique est survenue, merci de réessayer dans un instant.")
-            st.caption(f"Détail : {detail_erreur(exc)}")
+            logging.getLogger("billetterie").error("Erreur de réservation : %s", detail_erreur(exc))
 
     with compteur:
         try:
