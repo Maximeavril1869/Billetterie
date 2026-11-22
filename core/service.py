@@ -232,6 +232,19 @@ class Billetterie:
                 promus.append({**r, "statut": CONFIRMEE})
         return promus
 
+    def renvoyer_nouveau_lien(self):
+        """Renvoie à chaque réservation active un mail avec les infos à jour et le lien d'annulation courant.
+        Retourne (nombre d'envois réussis, liste des e-mails en échec)."""
+        ok, echecs = 0, []
+        for r in sorted(self.store.list(), key=lambda x: x["id"]):
+            if r["statut"] not in ACTIVES:
+                continue
+            if self._envoyer(r, *m.message_nouveau_lien(r, self.app_url)):
+                ok += 1
+            else:
+                echecs.append(r["email"])
+        return ok, echecs
+
     def _prevenir(self, promus):
         for r in promus:
             self._envoyer(r, *m.message_promotion(r, self.app_url))

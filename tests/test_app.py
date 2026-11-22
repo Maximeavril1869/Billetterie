@@ -141,3 +141,19 @@ def test_mention_donnees_avec_contact_gmail(monkeypatch):
     assert "31 décembre 2026" in mention
     assert "répondez simplement au mail de confirmation" in mention
     assert "asso@gmail.com" in mention
+
+
+def test_admin_renvoi_du_lien_avec_confirmation(monkeypatch):
+    import streamlit as st
+    st.cache_resource.clear()
+    at, store = lancer(monkeypatch, query={"admin": "1"}, secrets={"ADMIN_PASSWORD": "mdp"})
+    store.add({"prenom": "Ana", "nom": "Test", "email": "ana@ex.fr", "telephone": "0612345678",
+               "places": 2, "pmr": 0, "observations": "", "statut": "confirmee", "token": "tk", "cree": 1})
+    at.text_input[0].set_value("mdp").run()
+    bouton = next(b for b in at.button if "Renvoyer" in b.label)
+    assert bouton.disabled
+    at.checkbox[0].check().run()
+    bouton = next(b for b in at.button if "Renvoyer" in b.label)
+    assert not bouton.disabled
+    bouton.click().run()
+    assert any("1 mail(s) envoyé(s)" in s.value for s in at.success)

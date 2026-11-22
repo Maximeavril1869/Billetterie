@@ -46,3 +46,4 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
 - Mails de réservation confirmée : mention du bracelet remis à l'entrée (`BRACELET` dans `core/mailer.py`).
 - Formulaire : une seule légende regroupe plafond, règle « un enfant = une place » et bracelet, pour ne pas multiplier les blocs d'information.
 - Mails : adresse de la salle (`CONCERT["adresse"]`) + lien Google Maps généré par `_lien_plan()` dans `core/mailer.py`.
+- Admin : `renvoyer_nouveau_lien()` (service) + `message_nouveau_lien()` (mailer) renvoient un mail aux réservations actives ; protégé par une case à cocher et un verrou de session.

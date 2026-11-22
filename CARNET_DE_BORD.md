@@ -75,6 +75,11 @@
 - À faire côté secrets : `APP_URL` = ce lien, sans `/` final. Des mails réels avaient déjà été envoyés avec l'ancien lien :
   leurs liens d'annulation sont périmés (à vérifier).
 
+## 2026-11-22 — Renvoi du lien d'annulation
+- Le site a changé d'adresse (`ohl-sainte-cecile-2026.streamlit.app`) après l'envoi de vrais mails de confirmation.
+- Page admin : bouton « Renvoyer le mail de mise à jour » (case de confirmation obligatoire, un seul envoi par session) :
+  chaque réservation active reçoit les infos à jour et le nouveau lien d'annulation. `APP_URL` corrigé par l'utilisateur.
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.

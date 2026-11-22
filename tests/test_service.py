@@ -253,3 +253,17 @@ def test_bracelet_dans_les_mails_confirmes_seulement():
     token = b.store.list()[0]["token"]
     b.annuler(token)  # promeut Bob
     assert any("bracelet" in corps for _, sujet, corps in mailer.envoyes if "Places disponibles" in sujet)
+
+
+def test_renvoi_nouveau_lien_aux_reservations_actives_seulement():
+    b, _, mailer = fabrique(capacite=3)
+    res(b, "A", 2)
+    res(b, "B", 2)  # liste d'attente
+    res(b, "C", 1)
+    b.annuler(b.store.list()[2]["token"])  # C annulée
+    avant = len(mailer.envoyes)
+    ok, echecs = b.renvoyer_nouveau_lien()
+    nouveaux = mailer.envoyes[avant:]
+    assert ok == 2 and echecs == [] and len(nouveaux) == 2
+    assert all("https://x.app/?annuler=" in corps and "Nouveau lien" in sujet for _, sujet, corps in nouveaux)
+    assert "bracelet" in nouveaux[0][2] and "bracelet" not in nouveaux[1][2]

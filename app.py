@@ -204,6 +204,23 @@ def page_admin(svc):
         promus = svc.promouvoir()
         st.success(f"{len(promus)} réservation(s) confirmée(s) depuis la liste d'attente.")
 
+    st.divider()
+    st.subheader("Renvoyer le lien d'annulation")
+    st.caption(
+        "Envoie à toutes les réservations confirmées ou en attente un mail avec les infos à jour "
+        "et le lien d'annulation actuel (APP_URL). À utiliser une seule fois, après un changement d'adresse du site."
+    )
+    sur = st.checkbox("Je confirme l'envoi à toutes les réservations actives", key="confirme_envoi")
+    if st.button("Renvoyer le mail de mise à jour", disabled=not sur):
+        if st.session_state.get("envoi_fait"):
+            st.warning("Les mails ont déjà été envoyés pendant cette session. Recharge la page pour renvoyer.")
+        else:
+            st.session_state["envoi_fait"] = True
+            ok, echecs = svc.renvoyer_nouveau_lien()
+            st.success(f"{ok} mail(s) envoyé(s).")
+            if echecs:
+                st.error("Échec d'envoi pour : " + ", ".join(echecs))
+
 
 def page_publique(svc):
     entete()

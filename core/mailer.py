@@ -135,3 +135,19 @@ def message_modification(rec, app_url):
         f"Pour modifier ou annuler à nouveau :\n{_lien(app_url, rec['token'])}\n"
     )
     return f"Réservation modifiée - {CONCERT['titre']}", corps
+
+
+def message_nouveau_lien(rec, app_url):
+    confirmee = rec["statut"] == "confirmee"
+    etat = "CONFIRMÉE" if confirmee else "sur LISTE D'ATTENTE"
+    bracelet = f"{BRACELET}\n\n" if confirmee else ""
+    corps = (
+        f"Bonjour {_qui(rec)},\n\n"
+        f"Votre réservation de {_places_txt(rec)} est {etat}.\n\n"
+        "Le site de réservation a changé d'adresse : le lien d'annulation de notre précédent message "
+        "ne fonctionne plus. Pour modifier ou annuler votre réservation, utilisez désormais celui-ci :\n"
+        f"{_lien(app_url, rec['token'])}\n\n"
+        f"{_infos()}\n{_obs(rec)}\n"
+        f"{bracelet}"
+    )
+    return f"Nouveau lien d'annulation - {CONCERT['titre']}", corps
