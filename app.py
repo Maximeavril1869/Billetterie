@@ -75,14 +75,17 @@ def entete():
 .ent{display:flex;align-items:center;gap:18px;margin:4px 0 14px}
 .ent svg.logo{height:88px;width:auto;flex:0 0 auto}
 .ent>div:last-child{flex:1 1 0;min-width:0}
-.ent .titre{font-size:1.6rem;font-weight:700;line-height:1.15}
+.ent .asso{font-size:.95rem;font-weight:600;line-height:1.3;opacity:.9}
+.ent .titre{margin-top:4px;font-size:1.6rem;font-weight:700;line-height:1.15}
 .ent .sous{margin-top:8px;font-size:.98rem;line-height:1.55;opacity:.9}
 </style>"""
-        f'<div class="ent">{_logo_svg()}<div><div class="titre">🎶 {CONCERT["titre"]}</div>'
+        f'<div class="ent">{_logo_svg()}<div>'
+        f'<div class="asso">{CONCERT["orchestre"]}</div>'
+        f'<div class="titre">🎶 {CONCERT["titre"]}</div>'
         f'<div class="sous"><b>{CONCERT["date"]} à {CONCERT["heure"]}</b> — '
         f'ouverture des portes à {CONCERT["portes"]}<br>'
-        f'📍 {CONCERT["lieu"]} — placement {CONCERT["placement"]}<br>'
-        f'{CONCERT["asso"]} — entrée libre, réservation gratuite'
+        f'📍 {CONCERT["lieu"]} — entrée libre, réservation gratuite<br>'
+        f'Placement {CONCERT["placement"]}'
         "</div></div></div>",
         unsafe_allow_html=True,
     )

@@ -103,7 +103,8 @@ def test_entete_portes_et_placement_libre(monkeypatch):
     st.cache_resource.clear()
     at, _ = lancer(monkeypatch)
     texte = " ".join(m.value for m in at.markdown)
-    assert "ouverture des portes à 16h" in texte and "placement libre" in texte
+    assert "ouverture des portes à 16h" in texte and "Placement libre" in texte
+    assert texte.index("Orchestre l'Harmonie de Lempdes") < texte.index("Concert de la Sainte Cécile")
     assert any("placement est libre" in c.value for c in at.caption)
 
 

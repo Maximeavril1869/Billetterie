@@ -64,6 +64,9 @@
 ## 2026-11-22 — Infos sous le titre du formulaire
 - Une seule phrase d'information au-dessus du formulaire : plafond de 10 places, un enfant compte pour une place, bracelet remis à l'entrée.
 
+## 2026-11-22 — En-tête réordonné
+- Logo inchangé à gauche ; à droite : nom complet de l'orchestre (OHL), intitulé du concert, date et ouverture des portes, lieu et entrée libre, placement libre.
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.

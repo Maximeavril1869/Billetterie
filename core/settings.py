@@ -5,6 +5,7 @@ import os
 CONCERT = {
     "titre": "Concert de la Sainte Cécile",
     "asso": "Association des membres de l'OHL",
+    "orchestre": "Association des membres de l'Orchestre l'Harmonie de Lempdes (OHL)",
     "date": "samedi 12 décembre 2026",
     "heure": "17h",
     "portes": "16h",
