@@ -164,5 +164,5 @@ def test_logo_ville_de_lempdes_en_bas_de_page(monkeypatch):
     st.cache_resource.clear()
     at, _ = lancer(monkeypatch)
     assert not at.exception
-    assert (Path(__file__).resolve().parent.parent / "assets" / "logo-lempdes.jpg").exists()
+    assert (Path(__file__).resolve().parent.parent / "assets" / "logo-lempdes.png").exists()
     assert [type(e).__name__ for e in at.main].count("Image") == 1

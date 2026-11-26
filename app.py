@@ -93,8 +93,14 @@ def entete():
 
 def pied_de_page():
     """Logo de la Ville de Lempdes (la salle est municipale), en bas de la page publique."""
-    chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "logo-lempdes.jpg")
+    chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "logo-lempdes.png")
     if os.path.exists(chemin):
+        # Logo transparent : en thème sombre, un liseré clair garde le texte noir lisible.
+        st.markdown(
+            "<style>@media (prefers-color-scheme: dark){[data-testid='stImage'] img"
+            "{filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 2px #fff)}}</style>",
+            unsafe_allow_html=True,
+        )
         st.image(chemin, width=70, caption="Ville de Lempdes")
 
 
