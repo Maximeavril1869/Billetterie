@@ -157,3 +157,12 @@ def test_admin_renvoi_du_lien_avec_confirmation(monkeypatch):
     assert not bouton.disabled
     bouton.click().run()
     assert any("1 mail(s) envoyé(s)" in s.value for s in at.success)
+
+
+def test_logo_ville_de_lempdes_en_bas_de_page(monkeypatch):
+    import streamlit as st
+    st.cache_resource.clear()
+    at, _ = lancer(monkeypatch)
+    assert not at.exception
+    assert (Path(__file__).resolve().parent.parent / "assets" / "logo-lempdes.jpg").exists()
+    assert [type(e).__name__ for e in at.main].count("Image") == 1

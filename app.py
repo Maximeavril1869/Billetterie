@@ -91,6 +91,13 @@ def entete():
     )
 
 
+def pied_de_page():
+    """Logo de la Ville de Lempdes (la salle est municipale), en bas de la page publique."""
+    chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "logo-lempdes.jpg")
+    if os.path.exists(chemin):
+        st.image(chemin, width=70, caption="Ville de Lempdes")
+
+
 def mention_donnees():
     """Mention de protection des données ; le contact est l'adresse Gmail d'envoi des mails."""
     contact = secret("GMAIL_USER")
@@ -291,6 +298,8 @@ def page_publique(svc):
                 st.markdown(f"♿ **{e.pmr_restantes} places PMR restantes** sur {e.capacite_pmr}")
         except Exception:
             st.caption("Compteur momentanément indisponible.")
+
+    pied_de_page()
 
 
 svc = creer_service(_version_code())

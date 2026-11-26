@@ -80,6 +80,10 @@
 - Page admin : bouton « Renvoyer le mail de mise à jour » (case de confirmation obligatoire, un seul envoi par session) :
   chaque réservation active reçoit les infos à jour et le nouveau lien d'annulation. `APP_URL` corrigé par l'utilisateur.
 
+## 2026-11-26 — Logo de la Ville de Lempdes
+- Logo fourni par l'utilisateur (`assets/logo-lempdes.jpg`, réduit à 210×300 px) affiché en bas de la page publique, légende « Ville de Lempdes ».
+- Aucune mention de soutien ou de partenariat n'est affichée. Le logo appartient à la commune : l'accord de la mairie reste à confirmer.
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.
