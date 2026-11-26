@@ -81,7 +81,8 @@
   chaque réservation active reçoit les infos à jour et le nouveau lien d'annulation. `APP_URL` corrigé par l'utilisateur.
 
 ## 2026-11-26 — Logo de la Ville de Lempdes
-- Logo fourni par l'utilisateur (`assets/logo-lempdes.png`, transparent, 210×300 px ; liseré clair en thème sombre pour garder le texte noir lisible) affiché en bas de la page publique, légende « Ville de Lempdes ».
+- Logo fourni par l'utilisateur (`assets/logo-lempdes.jpg`, 210×300 px, fond blanc d'origine) affiché en haut à droite de l'en-tête,
+  en face du logo OHL (à gauche), légende alt « Ville de Lempdes ». Version transparente essayée puis abandonnée.
 - Aucune mention de soutien ou de partenariat n'est affichée. Le logo appartient à la commune : l'accord de la mairie reste à confirmer.
 
 ## Reste à faire

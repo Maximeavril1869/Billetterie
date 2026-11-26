@@ -1,4 +1,5 @@
 """Billetterie gratuite : page publique de réservation, annulation par lien, page admin."""
+import base64
 import hmac
 import logging
 import re
@@ -68,40 +69,38 @@ def _logo_svg():
     return " ".join(svg.split())  # une seule ligne, sans ligne vide (sinon le markdown la coupe)
 
 
+def _logo_ville_html():
+    """Logo de la Ville de Lempdes (JPG sur fond blanc) en base64, pour l'insérer dans l'en-tête."""
+    chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "logo-lempdes.jpg")
+    if not os.path.exists(chemin):
+        return ""
+    with open(chemin, "rb") as f:
+        donnees = base64.b64encode(f.read()).decode()
+    return f'<img class="logo-ville" alt="Ville de Lempdes" src="data:image/jpeg;base64,{donnees}">'
+
+
 def entete():
     """Logo + titre dans un seul bloc."""
     st.markdown(
         """<style>
 .ent{display:flex;align-items:center;gap:18px;margin:4px 0 14px}
 .ent svg.logo{height:88px;width:auto;flex:0 0 auto}
-.ent>div:last-child{flex:1 1 0;min-width:0}
+.ent .txt{flex:1 1 0;min-width:0}
+.ent img.logo-ville{height:76px;width:auto;flex:0 0 auto;border-radius:4px}
 .ent .asso{font-size:.95rem;font-weight:600;line-height:1.3;opacity:.9}
 .ent .titre{margin-top:4px;font-size:1.6rem;font-weight:700;line-height:1.15}
 .ent .sous{margin-top:8px;font-size:.98rem;line-height:1.55;opacity:.9}
 </style>"""
-        f'<div class="ent">{_logo_svg()}<div>'
+        f'<div class="ent">{_logo_svg()}<div class="txt">'
         f'<div class="asso">{CONCERT["orchestre"]}</div>'
         f'<div class="titre">🎶 {CONCERT["titre"]}</div>'
         f'<div class="sous"><b>{CONCERT["date"]} à {CONCERT["heure"]}</b> — '
         f'ouverture des portes à {CONCERT["portes"]}<br>'
         f'📍 {CONCERT["lieu"]} — entrée libre, réservation gratuite<br>'
         f'Placement {CONCERT["placement"]}'
-        "</div></div></div>",
+        f"</div></div>{_logo_ville_html()}</div>",
         unsafe_allow_html=True,
     )
-
-
-def pied_de_page():
-    """Logo de la Ville de Lempdes (la salle est municipale), en bas de la page publique."""
-    chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "logo-lempdes.png")
-    if os.path.exists(chemin):
-        # Logo transparent : en thème sombre, un liseré clair garde le texte noir lisible.
-        st.markdown(
-            "<style>@media (prefers-color-scheme: dark){[data-testid='stImage'] img"
-            "{filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 2px #fff)}}</style>",
-            unsafe_allow_html=True,
-        )
-        st.image(chemin, width=70, caption="Ville de Lempdes")
 
 
 def mention_donnees():
@@ -305,7 +304,6 @@ def page_publique(svc):
         except Exception:
             st.caption("Compteur momentanément indisponible.")
 
-    pied_de_page()
 
 
 svc = creer_service(_version_code())
