@@ -164,7 +164,7 @@ def test_logo_ville_de_lempdes_en_haut_a_droite(monkeypatch):
     st.cache_resource.clear()
     at, _ = lancer(monkeypatch)
     assert not at.exception
-    assert (Path(__file__).resolve().parent.parent / "assets" / "logo-lempdes.jpg").exists()
+    assert (Path(__file__).resolve().parent.parent / "assets" / "logo-lempdes.png").exists()
     entete = next(m.value for m in at.markdown if 'class="ent"' in m.value)
     assert entete.index('<svg class="logo"') < entete.index("Concert de la Sainte") < entete.index('class="logo-ville"')
-    assert "data:image/jpeg;base64," in entete
+    assert "data:image/png;base64," in entete

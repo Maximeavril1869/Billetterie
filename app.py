@@ -70,13 +70,13 @@ def _logo_svg():
 
 
 def _logo_ville_html():
-    """Logo de la Ville de Lempdes (JPG sur fond blanc) en base64, pour l'insérer dans l'en-tête."""
-    chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "logo-lempdes.jpg")
+    """Logo de la Ville de Lempdes (PNG transparent avec liseré blanc) en base64, pour l'insérer dans l'en-tête."""
+    chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "logo-lempdes.png")
     if not os.path.exists(chemin):
         return ""
     with open(chemin, "rb") as f:
         donnees = base64.b64encode(f.read()).decode()
-    return f'<img class="logo-ville" alt="Ville de Lempdes" src="data:image/jpeg;base64,{donnees}">'
+    return f'<img class="logo-ville" alt="Ville de Lempdes" src="data:image/png;base64,{donnees}">'
 
 
 def entete():
@@ -86,7 +86,7 @@ def entete():
 .ent{display:flex;align-items:center;gap:18px;margin:4px 0 14px}
 .ent svg.logo{height:88px;width:auto;flex:0 0 auto}
 .ent .txt{flex:1 1 0;min-width:0}
-.ent img.logo-ville{height:76px;width:auto;flex:0 0 auto;border-radius:4px}
+.ent img.logo-ville{height:76px;width:auto;flex:0 0 auto}
 .ent .asso{font-size:.95rem;font-weight:600;line-height:1.3;opacity:.9}
 .ent .titre{margin-top:4px;font-size:1.6rem;font-weight:700;line-height:1.15}
 .ent .sous{margin-top:8px;font-size:.98rem;line-height:1.55;opacity:.9}

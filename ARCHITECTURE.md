@@ -47,4 +47,4 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
 - Formulaire : une seule légende regroupe plafond, règle « un enfant = une place » et bracelet, pour ne pas multiplier les blocs d'information.
 - Mails : adresse de la salle (`CONCERT["adresse"]`) + lien Google Maps généré par `_lien_plan()` dans `core/mailer.py`.
 - Admin : `renvoyer_nouveau_lien()` (service) + `message_nouveau_lien()` (mailer) renvoient un mail aux réservations actives ; protégé par une case à cocher et un verrou de session.
-- En-tête : logo OHL à gauche, texte au centre, logo de la Ville de Lempdes (`assets/logo-lempdes.jpg`, fond blanc, inséré en base64 par `_logo_ville_html()` dans `app.py`) à droite.
+- En-tête : logo OHL à gauche, texte au centre, logo de la Ville de Lempdes (`assets/logo-lempdes.png`, PNG transparent avec liseré blanc (lisible en thème clair et sombre), inséré en base64 par `_logo_ville_html()` dans `app.py`) à droite.

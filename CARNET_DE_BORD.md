@@ -85,6 +85,12 @@
   en face du logo OHL (à gauche), légende alt « Ville de Lempdes ». Version transparente essayée puis abandonnée.
 - Aucune mention de soutien ou de partenariat n'est affichée. Le logo appartient à la commune : l'accord de la mairie reste à confirmer.
 
+## 2026-11-26 (soir) — Nouveau logo de la Ville de Lempdes (PNG transparent)
+- Le logo JPG sur fond blanc (`logo-lempdes.jpg`) est remplacé par `assets/logo-lempdes.png` : PNG transparent avec liseré blanc fourni par l'utilisateur,
+  réduit de 1542×2202 à 280×400 px (65 Ko). Le liseré blanc le rend lisible en thème sombre ; en thème clair, il se fond dans le fond blanc.
+- Code : `_logo_ville_html()` lit le PNG (`data:image/png`), coin arrondi retiré (inutile sans fond). Test mis à jour. Ancien JPG supprimé.
+- Reste à vérifier sur l'appli déployée (clair et sombre) et à confirmer auprès de la mairie.
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.
