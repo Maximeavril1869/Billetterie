@@ -91,6 +91,10 @@
 - Code : `_logo_ville_html()` lit le PNG (`data:image/png`), coin arrondi retiré (inutile sans fond). Test mis à jour. Ancien JPG supprimé.
 - Reste à vérifier sur l'appli déployée (clair et sombre) et à confirmer auprès de la mairie.
 
+## 2026-11-26 (soir) — Logo de la Ville plus grand
+- Hauteur du logo de la Ville portée de 76 à 120 px (`.ent img.logo-ville` dans `app.py`), soit environ 84 px de large : présence visuelle équivalente au logo OHL (88 px de haut, environ 114 px de large).
+- Le PNG (280×400 px) reste suffisant : la taille affichée se règle en CSS, pas par la taille du fichier. À vérifier sur iPhone : le texte de l'en-tête dispose de moins de largeur.
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.
