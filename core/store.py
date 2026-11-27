@@ -1,5 +1,6 @@
 """Accès à la table Grist des réservations (API REST)."""
 import json
+import unicodedata
 
 import requests
 
@@ -45,10 +46,10 @@ class GristStore:
                     "nom": f.get("Nom") or "",
                     "email": (f.get("Email") or "").lower(),
                     "telephone": f.get("Telephone") or "",
-                    "places": int(f.get("Places") or 0),
-                    "pmr": int(f.get("PMR") or 0),
+                    "places": _entier(f.get("Places")),
+                    "pmr": _entier(f.get("PMR")),
                     "observations": f.get("Observations") or "",
-                    "statut": f.get("Statut") or "",
+                    "statut": _statut(f.get("Statut"), f.get("Places"), f.get("PMR")),
                     "token": f.get("Token") or "",
                     "cree": f.get("DateCommande") or 0,
                 }
@@ -113,6 +114,29 @@ class GristStore:
             timeout=self.timeout,
         )
         r.raise_for_status()
+
+
+def _entier(valeur):
+    """Nombre de places lu dans Grist, tolérant aux saisies à la main (« 2 », 2.0, vide...)."""
+    if valeur is None or isinstance(valeur, bool):
+        return 0
+    try:
+        return max(int(float(str(valeur).strip().replace(",", "."))), 0)
+    except ValueError:
+        return 0
+
+
+def _statut(valeur, places=None, pmr=None):
+    """Statut normalisé : « Confirmée », « confirmé »... -> confirmee.
+    Une ligne ajoutée à la main sans statut mais avec des places compte comme confirmée."""
+    texte = unicodedata.normalize("NFKD", str(valeur or "")).encode("ascii", "ignore").decode()
+    texte = texte.strip().lower()
+    if not texte:
+        return "confirmee" if _entier(places) + _entier(pmr) > 0 else ""
+    for statut in STATUTS:
+        if statut[:5] in texte:  # confi / atten / annul (« en attente » aussi)
+            return statut
+    return texte
 
 
 def _definitions():

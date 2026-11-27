@@ -95,6 +95,16 @@
 - Hauteur du logo de la Ville portée de 76 à 120 px (`.ent img.logo-ville` dans `app.py`), soit environ 84 px de large : présence visuelle équivalente au logo OHL (88 px de haut, environ 114 px de large).
 - Le PNG (280×400 px) reste suffisant : la taille affichée se règle en CSS, pas par la taille du fichier. À vérifier sur iPhone : le texte de l'en-tête dispose de moins de largeur.
 
+## 2026-11-27 — v1.1.0 : places ajoutées à la main dans Grist, version affichée
+- Demande : l'utilisateur a ajouté à la main 2 places prises dans Grist et veut que le total du site corresponde.
+- Le site lit Grist en direct (pas de cache des données), mais ne comptait que les lignes au statut exact `confirmee`.
+  Une ligne saisie à la main avec un statut vide ou écrit autrement (« Confirmée », « confirmé ») était ignorée.
+- Lecture Grist plus tolérante (`_statut()` et `_entier()` dans `core/store.py`) : accents et majuscules ignorés,
+  « en attente » / « annulé » reconnus, ligne sans statut mais avec des places = confirmée, places saisies en texte (« 2 ») acceptées.
+- Le renvoi du mail de mise à jour (admin) ignore les lignes sans e-mail.
+- Numéro de version affiché en bas de chaque page (`VERSION` dans `core/settings.py`) : **1.1.0**. 2 tests ajoutés (48 tests OK).
+- À vérifier par l'utilisateur sur le site : places restantes = 300 − total confirmé dans Grist.
+
 ## Reste à faire
 - Créer le document Grist, la clé API et le mot de passe d'application Gmail.
 - Lancer `setup_grist.py`, déployer sur Streamlit Community Cloud, renseigner les secrets.

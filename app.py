@@ -12,7 +12,7 @@ import os
 
 from core.settings import (
     CAPACITE, CAPACITE_PMR, CONCERT, MAX_OBSERVATIONS, MAX_PAR_RESERVATION, MAX_PMR_PAR_RESERVATION,
-    TABLE, UNE_RESA_PAR_EMAIL, secret,
+    TABLE, UNE_RESA_PAR_EMAIL, VERSION, secret,
 )
 from core.store import GristStore
 
@@ -314,3 +314,4 @@ elif "admin" in params:
     page_admin(svc)
 else:
     page_publique(svc)
+st.caption(f"Version {VERSION}")

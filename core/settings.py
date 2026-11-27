@@ -1,6 +1,8 @@
 """Paramètres de l'appli : infos du concert, jauge et lecture des secrets."""
 import os
 
+VERSION = "1.1.0"  # version de l'appli, affichée en bas des pages
+
 # ---- À modifier ici si besoin -------------------------------------------
 CONCERT = {
     "titre": "Concert de la Sainte Cécile",

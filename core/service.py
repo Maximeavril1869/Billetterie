@@ -237,8 +237,8 @@ class Billetterie:
         Retourne (nombre d'envois réussis, liste des e-mails en échec)."""
         ok, echecs = 0, []
         for r in sorted(self.store.list(), key=lambda x: x["id"]):
-            if r["statut"] not in ACTIVES:
-                continue
+            if r["statut"] not in ACTIVES or not r["email"]:
+                continue  # lignes saisies à la main sans e-mail : rien à envoyer
             if self._envoyer(r, *m.message_nouveau_lien(r, self.app_url)):
                 ok += 1
             else:

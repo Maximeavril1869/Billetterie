@@ -35,3 +35,16 @@ def test_ecriture_tolerante_colonne_absente():
     assert rid == 7
     assert st.session.appels[-1] == {"Nom": "A", "Email": "a@ex.fr"}   # DateCommande retirée
     assert len(st.session.appels) == 2
+
+
+def test_lignes_saisies_a_la_main():
+    from core.store import _entier, _statut
+
+    assert _entier("2") == 2 and _entier(2.0) == 2 and _entier(" 3 ") == 3
+    assert _entier(None) == 0 and _entier("") == 0 and _entier("deux") == 0
+    assert _statut("Confirmée") == "confirmee"
+    assert _statut(" confirmé ") == "confirmee"
+    assert _statut("En attente") == "attente"
+    assert _statut("Annulé") == "annulee"
+    assert _statut("", 2) == "confirmee"  # ligne ajoutée à la main sans statut
+    assert _statut(None, 0, 0) == ""      # ligne vide : ignorée

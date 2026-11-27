@@ -267,3 +267,15 @@ def test_renvoi_nouveau_lien_aux_reservations_actives_seulement():
     assert ok == 2 and echecs == [] and len(nouveaux) == 2
     assert all("https://x.app/?annuler=" in corps and "Nouveau lien" in sujet for _, sujet, corps in nouveaux)
     assert "bracelet" in nouveaux[0][2] and "bracelet" not in nouveaux[1][2]
+
+
+def test_places_ajoutees_a_la_main_comptent_et_sans_mail():
+    from tests.fake_store import FakeStore
+    from core.service import Billetterie
+
+    store = FakeStore()
+    store.add({"prenom": "", "nom": "", "email": "", "telephone": "", "places": 2, "pmr": 0,
+               "observations": "", "statut": "confirmee", "token": "", "cree": 0})
+    svc = Billetterie(store, type("M", (), {"send": lambda *a: None})(), 300, 10, capacite_pmr=4, max_pmr_par_resa=2)
+    assert svc.etat().restantes == 298
+    assert svc.renvoyer_nouveau_lien() == (0, [])

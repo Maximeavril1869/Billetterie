@@ -48,3 +48,5 @@ Visiteur ──► app.py (Streamlit) ──► core/service.py (règles métier
 - Mails : adresse de la salle (`CONCERT["adresse"]`) + lien Google Maps généré par `_lien_plan()` dans `core/mailer.py`.
 - Admin : `renvoyer_nouveau_lien()` (service) + `message_nouveau_lien()` (mailer) renvoient un mail aux réservations actives ; protégé par une case à cocher et un verrou de session.
 - En-tête : logo OHL à gauche, texte au centre, logo de la Ville de Lempdes (120 px de haut, `assets/logo-lempdes.png`, PNG transparent avec liseré blanc (lisible en thème clair et sombre), inséré en base64 par `_logo_ville_html()` dans `app.py`) à droite.
+- Lignes saisies à la main dans Grist : statut lu de façon tolérante (`_statut()` dans `core/store.py` : accents/majuscules ignorés, statut vide + places = confirmée), nombre de places lu par `_entier()`.
+- Version de l'appli : `VERSION` dans `core/settings.py`, affichée en bas de chaque page.
